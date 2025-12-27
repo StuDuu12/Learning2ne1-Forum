@@ -1,0 +1,80 @@
+.profile-header {
+    background: linear-gradient(135deg, var(--primary-mint), var(--light-mint));
+    padding: 3rem 2rem;
+    border-radius: 15px;
+    color: white;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    background: white;
+    color: var(--primary-mint);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 0 auto 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.posts-section {
+    /* Cards now have individual backgrounds */
+}
+
+.post-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+}
+
+.post-card:hover {
+    transform: translateY(-5px);
+}
+
+.post-card:last-child {
+    margin-bottom: 0;
+}
+
+.post-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.post-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #636e72;
+    font-size: 0.9rem;
+}

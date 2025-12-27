@@ -1,0 +1,228 @@
+/* Create Post Page Styles */
+.create-header {
+    background: linear-gradient(135deg, var(--primary-mint), var(--light-mint));
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 15px;
+    color: white;
+}
+
+.form-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.form-section h3 {
+    color: var(--primary-mint);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-group input[type='text'],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--bg-grey);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-group textarea {
+    min-height: 200px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-mint);
+}
+
+.tag-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--bg-grey);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.tag-input:focus {
+    outline: none;
+    border-color: var(--primary-mint);
+}
+
+.tag-hint {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.privacy-options {
+    display: flex;
+    gap: 1rem;
+}
+
+.privacy-option {
+    flex: 1;
+    padding: 1rem;
+    border: 2px solid var(--bg-grey);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.privacy-option input {
+    display: none;
+}
+
+.privacy-option input:checked + label {
+    font-weight: bold;
+}
+
+.privacy-option:has(input:checked) {
+    border-color: var(--primary-mint);
+    background: rgba(0, 184, 148, 0.1);
+}
+
+.file-upload {
+    border: 2px dashed var(--bg-grey);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.file-upload:hover {
+    border-color: var(--primary-mint);
+    background: rgba(0, 184, 148, 0.05);
+}
+
+.image-preview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.preview-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--bg-grey);
+    aspect-ratio: 1;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-item .file-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 1rem;
+    background: var(--bg-grey);
+}
+
+.preview-item .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #ff7675;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.preview-item .remove-btn:hover {
+    background: #d63031;
+}
+
+.poll-options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.poll-option-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-add-option {
+    background: var(--accent-yellow);
+    color: var(--text-dark);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-submit {
+    background: var(--primary-mint);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.btn-submit:hover {
+    background: var(--light-mint);
+    transform: translateY(-2px);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.alert-error {
+    background: #ff7675;
+    color: white;
+}
+
+.alert-success {
+    background: #00b894;
+    color: white;
+}

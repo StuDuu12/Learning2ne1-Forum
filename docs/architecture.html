@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>System Architecture - Diễn đàn Sinh viên</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: #f7f9fa;
+                padding: 2rem;
+            }
+
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            h1 {
+                text-align: center;
+                color: #00b894;
+                margin-bottom: 2rem;
+                font-size: 2.5rem;
+            }
+
+            .architecture {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+                margin-bottom: 3rem;
+            }
+
+            .layer {
+                background: white;
+                padding: 2rem;
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .layer-title {
+                background: linear-gradient(135deg, #00b894, #55efc4);
+                color: white;
+                padding: 1rem;
+                border-radius: 10px;
+                text-align: center;
+                margin-bottom: 1rem;
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+
+            .component {
+                background: #f7f9fa;
+                padding: 1rem;
+                margin: 0.5rem 0;
+                border-radius: 8px;
+                border-left: 4px solid #00b894;
+                transition: all 0.3s;
+            }
+
+            .component:hover {
+                transform: translateX(10px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .component-title {
+                font-weight: bold;
+                color: #2d3436;
+                margin-bottom: 0.25rem;
+            }
+
+            .component-desc {
+                font-size: 0.85rem;
+                color: #636e72;
+            }
+
+            .flow-diagram {
+                background: white;
+                padding: 2rem;
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                margin-bottom: 3rem;
+            }
+
+            .flow-title {
+                text-align: center;
+                color: #00b894;
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .flow-steps {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .flow-step {
+                background: linear-gradient(135deg, #00b894, #55efc4);
+                color: white;
+                padding: 1.5rem;
+                border-radius: 10px;
+                text-align: center;
+                min-width: 150px;
+                position: relative;
+            }
+
+            .flow-step::after {
+                content: '→';
+                position: absolute;
+                right: -30px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 2rem;
+                color: #00b894;
+            }
+
+            .flow-step:last-child::after {
+                display: none;
+            }
+
+            .database-schema {
+                background: white;
+                padding: 2rem;
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .table-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .table-card {
+                background: #f7f9fa;
+                padding: 1rem;
+                border-radius: 8px;
+                border-top: 4px solid #00b894;
+            }
+
+            .table-name {
+                font-weight: bold;
+                color: #00b894;
+                margin-bottom: 0.5rem;
+                font-size: 1.1rem;
+            }
+
+            .table-fields {
+                font-size: 0.85rem;
+                color: #636e72;
+                line-height: 1.6;
+            }
+
+            .stats {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+                margin: 2rem 0;
+            }
+
+            .stat-box {
+                background: linear-gradient(135deg, #00b894, #55efc4);
+                color: white;
+                padding: 1.5rem;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.9rem;
+                opacity: 0.9;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🏗️ System Architecture Overview</h1>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value">15+</div>
+                    <div class="stat-label">Files Created</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Database Tables</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">25+</div>
+                    <div class="stat-label">Functions</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Procedural PHP</div>
+                </div>
+            </div>
+
+            <div class="architecture">
+                <!-- Frontend Layer -->
+                <div class="layer">
+                    <div class="layer-title">🎨 Frontend Layer</div>
+
+                    <div class="component">
+                        <div class="component-title">index.php</div>
+                        <div class="component-desc">Homepage with feed algorithm</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">login.php</div>
+                        <div class="component-desc">Authentication interface</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">create_post.php</div>
+                        <div class="component-desc">Post creation form</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">post.php</div>
+                        <div class="component-desc">Post detail & interactions</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">dashboard.php</div>
+                        <div class="component-desc">Statistics with Chart.js</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">profile.php</div>
+                        <div class="component-desc">User profile page</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">navbar.php</div>
+                        <div class="component-desc">Navigation component</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">style.css</div>
+                        <div class="component-desc">Global styling</div>
+                    </div>
+                </div>
+
+                <!-- Backend Layer -->
+                <div class="layer">
+                    <div class="layer-title">⚙️ Backend Layer</div>
+
+                    <div class="component">
+                        <div class="component-title">config.php</div>
+                        <div class="component-desc">Database & session config</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">functions.php</div>
+                        <div class="component-desc">25+ helper functions</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">ajax.php</div>
+                        <div class="component-desc">AJAX request handler</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">logout.php</div>
+                        <div class="component-desc">Session destruction</div>
+                    </div>
+
+                    <div style="background: #fff3cd; padding: 1rem; margin-top: 1rem; border-radius: 8px; border-left: 4px solid #ffc107">
+                        <strong>🔒 Security:</strong><br />
+                        • PDO Prepared Statements<br />
+                        • XSS Protection<br />
+                        • CSRF Prevention<br />
+                        • File Upload Validation
+                    </div>
+                </div>
+
+                <!-- Database Layer -->
+                <div class="layer">
+                    <div class="layer-title">💾 Database Layer</div>
+
+                    <div class="component">
+                        <div class="component-title">MySQL 8.0+</div>
+                        <div class="component-desc">Relational database</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">PDO Driver</div>
+                        <div class="component-desc">Prepared statements</div>
+                    </div>
+
+                    <div class="component">
+                        <div class="component-title">9 Tables</div>
+                        <div class="component-desc">Normalized schema</div>
+                    </div>
+
+                    <div style="background: #d4edda; padding: 1rem; margin-top: 1rem; border-radius: 8px; border-left: 4px solid #28a745">
+                        <strong>📊 Tables:</strong><br />
+                        • user (existing)<br />
+                        • posts<br />
+                        • attachments<br />
+                        • comments<br />
+                        • likes<br />
+                        • polls<br />
+                        • poll_options<br />
+                        • poll_votes<br />
+                        • user_interests
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Flow -->
+            <div class="flow-diagram">
+                <h2 class="flow-title">🔄 User Interaction Flow</h2>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem">👤</div>
+                        <strong>Guest</strong><br />
+                        <small>View public posts</small>
+                    </div>
+                    <div class="flow-step">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem">🔐</div>
+                        <strong>Login</strong><br />
+                        <small>Authentication</small>
+                    </div>
+                    <div class="flow-step">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem">📝</div>
+                        <strong>Create</strong><br />
+                        <small>Post with files</small>
+                    </div>
+                    <div class="flow-step">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem">💬</div>
+                        <strong>Interact</strong><br />
+                        <small>Like & Comment</small>
+                    </div>
+                    <div class="flow-step">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem">📊</div>
+                        <strong>Dashboard</strong><br />
+                        <small>View statistics</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Database Schema -->
+            <div class="database-schema">
+                <h2 class="flow-title">🗄️ Database Schema</h2>
+                <div class="table-grid">
+                    <div class="table-card">
+                        <div class="table-name">user</div>
+                        <div class="table-fields">
+                            • id_user (PK)<br />
+                            • ho_ten<br />
+                            • username<br />
+                            • password (MD5)<br />
+                            • account_level
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-name">posts</div>
+                        <div class="table-fields">
+                            • id (PK)<br />
+                            • user_id (FK)<br />
+                            • title, content<br />
+                            • tags, privacy<br />
+                            • status, views
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-name">comments</div>
+                        <div class="table-fields">
+                            • id (PK)<br />
+                            • post_id (FK)<br />
+                            • user_id (FK)<br />
+                            • content<br />
+                            • parent_id (FK)
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-name">likes</div>
+                        <div class="table-fields">
+                            • id (PK)<br />
+                            • user_id (FK)<br />
+                            • target_id<br />
+                            • target_type<br />
+                            • UNIQUE constraint
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-name">attachments</div>
+                        <div class="table-fields">
+                            • id (PK)<br />
+                            • post_id (FK)<br />
+                            • file_path<br />
+                            • file_type<br />
+                            • created_at
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-name">polls</div>
+                        <div class="table-fields">
+                            • id (PK)<br />
+                            • post_id (FK)<br />
+                            • question<br />
+                            • created_at
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-name">poll_options</div>
+                        <div class="table-fields">
+                            • id (PK)<br />
+                            • poll_id (FK)<br />
+                            • option_text
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-name">poll_votes</div>
+                        <div class="table-fields">
+                            • id (PK)<br />
+                            • option_id (FK)<br />
+                            • user_id (FK)<br />
+                            • UNIQUE constraint
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-name">user_interests</div>
+                        <div class="table-fields">
+                            • id (PK)<br />
+                            • user_id (FK)<br />
+                            • tag<br />
+                            • score<br />
+                            • UNIQUE constraint
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="
+                    text-align: center;
+                    margin-top: 3rem;
+                    padding: 2rem;
+                    background: linear-gradient(135deg, #00b894, #55efc4);
+                    color: white;
+                    border-radius: 15px;
+                ">
+                <h2 style="margin-bottom: 1rem">✅ System Complete & Ready</h2>
+                <p style="font-size: 1.1rem">All components integrated and tested</p>
+                <a
+                    href="start.html"
+                    style="
+                        display: inline-block;
+                        margin-top: 1rem;
+                        padding: 1rem 2rem;
+                        background: white;
+                        color: #00b894;
+                        text-decoration: none;
+                        border-radius: 8px;
+                        font-weight: bold;
+                    ">
+                    🚀 Get Started
+                </a>
+            </div>
+        </div>
+    </body>
+</html>

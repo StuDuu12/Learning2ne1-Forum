@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>📚 Project Hub - Diễn đàn Sinh viên</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #00b894, #55efc4);
+                min-height: 100vh;
+                padding: 2rem;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .header {
+                background: white;
+                padding: 3rem;
+                border-radius: 20px;
+                text-align: center;
+                margin-bottom: 2rem;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            }
+
+            .header h1 {
+                color: #00b894;
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            .header p {
+                color: #636e72;
+                font-size: 1.2rem;
+            }
+
+            .cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .card {
+                background: white;
+                padding: 2rem;
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s;
+                text-decoration: none;
+                color: inherit;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            }
+
+            .card-icon {
+                font-size: 4rem;
+                margin-bottom: 1rem;
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #00b894;
+                margin-bottom: 0.5rem;
+            }
+
+            .card-desc {
+                color: #636e72;
+                line-height: 1.6;
+                flex-grow: 1;
+            }
+
+            .card-action {
+                background: #00b894;
+                color: white;
+                padding: 0.75rem;
+                text-align: center;
+                border-radius: 8px;
+                margin-top: 1rem;
+                font-weight: bold;
+            }
+
+            .card:hover .card-action {
+                background: #55efc4;
+            }
+
+            .quick-stats {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .stat {
+                background: white;
+                padding: 1.5rem;
+                border-radius: 10px;
+                text-align: center;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .stat-value {
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: #00b894;
+            }
+
+            .stat-label {
+                color: #636e72;
+                margin-top: 0.5rem;
+            }
+
+            .features {
+                background: white;
+                padding: 2rem;
+                border-radius: 15px;
+                margin-bottom: 2rem;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .features h2 {
+                color: #00b894;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+
+            .feature-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .feature {
+                background: #f7f9fa;
+                padding: 1rem;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .feature-emoji {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            @media (max-width: 768px) {
+                .quick-stats {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                .header h1 {
+                    font-size: 2rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎓 Student Discussion Forum</h1>
+                <p>Complete Educational Forum System - Procedural PHP</p>
+                <p style="margin-top: 1rem; font-size: 1rem; color: #00b894">
+                    <strong>Status:</strong> ✅ Production Ready | <strong>Files:</strong> 15+ | <strong>Lines:</strong> 3000+
+                </p>
+            </div>
+
+            <div class="quick-stats">
+                <div class="stat">
+                    <div class="stat-value">15+</div>
+                    <div class="stat-label">PHP Files</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">DB Tables</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">25+</div>
+                    <div class="stat-label">Functions</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Procedural</div>
+                </div>
+            </div>
+
+            <div class="cards">
+                <a href="start.html" class="card">
+                    <div class="card-icon">🚀</div>
+                    <div class="card-title">Quick Start Guide</div>
+                    <div class="card-desc">Step-by-step installation instructions with demo accounts and sample data.</div>
+                    <div class="card-action">Start Here →</div>
+                </a>
+
+                <a href="index.php" class="card">
+                    <div class="card-icon">🏠</div>
+                    <div class="card-title">Launch Application</div>
+                    <div class="card-desc">Go directly to the forum homepage. Browse posts, login, and start participating.</div>
+                    <div class="card-action">Open Forum →</div>
+                </a>
+
+                <a href="architecture.html" class="card">
+                    <div class="card-icon">🏗️</div>
+                    <div class="card-title">System Architecture</div>
+                    <div class="card-desc">Visual overview of system layers, database schema, and component interactions.</div>
+                    <div class="card-action">View Diagram →</div>
+                </a>
+
+                <a href="DOCUMENTATION.md" class="card" target="_blank">
+                    <div class="card-icon">📚</div>
+                    <div class="card-title">Technical Documentation</div>
+                    <div class="card-desc">Complete API reference, function docs, algorithms, and security measures.</div>
+                    <div class="card-action">Read Docs →</div>
+                </a>
+
+                <a href="PROJECT_SUMMARY.md" class="card" target="_blank">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">Project Summary</div>
+                    <div class="card-desc">Comprehensive overview of all features, requirements met, and deliverables.</div>
+                    <div class="card-action">View Summary →</div>
+                </a>
+
+                <a href="README.md" class="card" target="_blank">
+                    <div class="card-icon">📖</div>
+                    <div class="card-title">User Guide</div>
+                    <div class="card-desc">Installation steps, configuration guide, and tips for customization.</div>
+                    <div class="card-action">Read Guide →</div>
+                </a>
+            </div>
+
+            <div class="features">
+                <h2>✨ Key Features Implemented</h2>
+                <div class="feature-grid">
+                    <div class="feature">
+                        <div class="feature-emoji">🔐</div>
+                        <strong>Authentication</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Login/Register/Roles</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">✍️</div>
+                        <strong>Rich Posts</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Tags, Files, Polls</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">💬</div>
+                        <strong>Comments</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Threaded Replies</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">❤️</div>
+                        <strong>Like System</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Posts & Comments</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">📊</div>
+                        <strong>Polls</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Survey System</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">🔥</div>
+                        <strong>Trending</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Smart Algorithm</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">🎯</div>
+                        <strong>Recommendations</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Personalized Feed</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">📈</div>
+                        <strong>Dashboard</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Chart.js Stats</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">🔒</div>
+                        <strong>Security</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">PDO + XSS Protection</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">👁️</div>
+                        <strong>Privacy</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Public/Private Posts</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">@</div>
+                        <strong>Mentions</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">@username Support</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-emoji">📁</div>
+                        <strong>File Upload</strong>
+                        <div style="font-size: 0.85rem; color: #636e72; margin-top: 0.25rem">Images & PDF</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1)">
+                <h3 style="color: #00b894; margin-bottom: 1rem">🎉 Ready to Get Started?</h3>
+                <p style="color: #636e72; margin-bottom: 1.5rem">Follow the Quick Start Guide to set up the database and configure the system.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap">
+                    <a
+                        href="start.html"
+                        style="
+                            display: inline-block;
+                            padding: 1rem 2rem;
+                            background: #00b894;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: bold;
+                        ">
+                        📖 Setup Guide
+                    </a>
+                    <a
+                        href="index.php"
+                        style="
+                            display: inline-block;
+                            padding: 1rem 2rem;
+                            background: #ffd740;
+                            color: #2d3436;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: bold;
+                        ">
+                        🚀 Launch Forum
+                    </a>
+                    <a
+                        href="architecture.html"
+                        style="
+                            display: inline-block;
+                            padding: 1rem 2rem;
+                            background: #636e72;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: bold;
+                        ">
+                        🏗️ View Architecture
+                    </a>
+                </div>
+
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #f7f9fa">
+                    <p style="color: #636e72">
+                        <strong>Demo Credentials:</strong><br />
+                        Usernames: admin, teacher1, student1, student2, student3<br />
+                        Password: <code style="background: #f7f9fa; padding: 0.25rem 0.5rem; border-radius: 4px">123456</code>
+                    </p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem; color: white">
+                <p>Made with ❤️ for Educational Excellence</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.9">
+                    Strictly Procedural PHP • No OOP/Classes • PDO Security • Chart.js Visualization
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

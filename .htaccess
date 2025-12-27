@@ -1,0 +1,70 @@
+# Apache Configuration for Student Discussion Forum
+
+# Enable Rewrite Engine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Redirect to start.html if accessing root
+    DirectoryIndex index.php start.html
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    # Prevent Clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Content Type Sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# PHP Settings
+<IfModule mod_php7.c>
+    # Upload limits
+    php_value upload_max_filesize 5M
+    php_value post_max_size 6M
+    
+    # Session settings
+    php_value session.cookie_httponly 1
+    
+    # Error handling (disable in production)
+    php_flag display_errors Off
+    php_flag log_errors On
+</IfModule>
+
+# Protect sensitive files
+<FilesMatch "^(config\.php|functions\.php|\.env)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Prevent directory browsing
+Options -Indexes
+
+# Custom error pages
+ErrorDocument 400 /errors/400.php
+ErrorDocument 403 /errors/403.php
+ErrorDocument 404 /errors/404.php
+ErrorDocument 500 /errors/500.php
+ErrorDocument 503 /errors/503.php
+
+# Compression for better performance
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+</IfModule>
+
+# Browser Caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
