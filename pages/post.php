@@ -446,7 +446,7 @@ $user_liked = isLoggedIn() ? hasLiked($pdo, $_SESSION['user_id'], $post_id, 'pos
                         <textarea name="content" required><?= h($post['content']) ?></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Tags (phân cách bằng dấu phẩy hoặc khoảng trắng)</label>
+                        <label>Tags</label>
                         <input type="text" name="tags" value="<?= h($post['tags']) ?>" placeholder="HTML, CSS, JavaScript hoặc HTML CSS JavaScript">
                     </div>
                     <div style="display: flex; gap: 1rem;">
@@ -464,6 +464,8 @@ $user_liked = isLoggedIn() ? hasLiked($pdo, $_SESSION['user_id'], $post_id, 'pos
             <?= date('d/m/Y H:i', strtotime($post['created_at'])) ?>
         </p>
     </footer>
+
+    <script src="../assets/js/post.js"></script>
 </body>
 
 </html>

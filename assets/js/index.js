@@ -961,3 +961,47 @@ if (document.querySelector('.btn-notification')) {
     updateNotificationCount();
     setInterval(updateNotificationCount, 30000);
 }
+
+// Initialize community chart if data exists (guest view)
+if (typeof communityChartLabels !== 'undefined' && document.getElementById('communityChart')) {
+    const ctx = document.getElementById('communityChart').getContext('2d');
+    // Simple pastel color set
+    const colors = ['#7fe0b9', '#a2e2d6', '#ffd97d', '#ff9aa2', '#c39eff', '#90cdf4', '#f6d8a8', '#b9fbc0', '#ffd6e0', '#c7f9cc'];
+
+    const barColors = communityChartData.map((_, i) => colors[i % colors.length]);
+
+    const communityChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: communityChartLabels,
+            datasets: [
+                {
+                    label: 'Số bài viết',
+                    data: communityChartData,
+                    backgroundColor: barColors,
+                    borderRadius: 6,
+                    maxBarThickness: 40,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { mode: 'index', intersect: false },
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#495057' },
+                    grid: { display: false },
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#495057', stepSize: 1 },
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                },
+            },
+        },
+    });
+}

@@ -105,7 +105,38 @@ $all_posts = $stmt->fetchAll();
                 <h2 style="color: var(--primary-mint); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                     📊 Xu hướng cộng đồng
                 </h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+
+                <?php
+                // Prepare chart data: top tags from public posts (top 10)
+                $stmt = $pdo->prepare("SELECT tags FROM posts WHERE privacy = 'public' AND tags IS NOT NULL AND tags <> ''");
+                $stmt->execute();
+                $tag_counts = [];
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $tags_raw = $row['tags'];
+                    $parts = array_filter(array_map('trim', explode(',', $tags_raw)));
+                    foreach ($parts as $t) {
+                        if ($t === '') continue;
+                        // Normalize: ensure starts with # and use lowercase for counting
+                        $raw = ltrim($t);
+                        if ($raw === '') continue;
+                        // remove leading # if any then lowercase
+                        $normalized = mb_strtolower(ltrim($raw, '#'), 'UTF-8');
+                        $key = '#' . $normalized;
+                        if (!isset($tag_counts[$key])) $tag_counts[$key] = 0;
+                        $tag_counts[$key]++;
+                    }
+                }
+                arsort($tag_counts);
+                $top = array_slice($tag_counts, 0, 10, true);
+                $chart_labels = array_map('strtoupper', array_keys($top));
+                $chart_data = array_values($top);
+                $rows = [];
+                foreach ($top as $tag => $cnt) {
+                    $rows[] = ['name' => $tag, 'cnt' => $cnt];
+                }
+                ?>
+
+                <div style="display: grid; grid-template-columns: 1fr 320px; gap: 1rem; align-items: center;">
                     <?php
                     // Thống kê tổng quan
                     $stats = [];
@@ -132,26 +163,27 @@ $all_posts = $stmt->fetchAll();
                     $stats['comments'] = $stmt->fetch()['count'];
                     ?>
 
-                    <div style="background: linear-gradient(135deg, #00d2d3, #00bfbf); padding: 1.5rem; border-radius: 10px; color: white; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;"><?= number_format($stats['posts']) ?></div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">📝 Bài viết</div>
+                    <div>
+                        <canvas id="communityChart" style="max-width:100%; height:260px;"></canvas>
                     </div>
-
-                    <div style="background: linear-gradient(135deg, #fdcb6e, #f39c12); padding: 1.5rem; border-radius: 10px; color: white; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;"><?= number_format($stats['users']) ?></div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">👥 Thành viên</div>
-                    </div>
-
-                    <div style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); padding: 1.5rem; border-radius: 10px; color: white; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;"><?= number_format($stats['hot_posts']) ?></div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">🔥 Hot (7 ngày)</div>
-                    </div>
-
-                    <div style="background: linear-gradient(135deg, #a29bfe, #6c5ce7); padding: 1.5rem; border-radius: 10px; color: white; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;"><?= number_format($stats['comments']) ?></div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">💬 Bình luận</div>
+                    <div style="padding: 1rem; border-radius: 8px; background: var(--bg-grey);">
+                        <h4 style="margin-top: 0; color: var(--primary-mint);">Top thẻ</h4>
+                        <ul style="margin: 0; padding: 0; list-style: none;">
+                            <?php foreach ($rows as $r): ?>
+                                <li style="padding: 0.35rem 0; border-bottom: 1px solid rgba(0,0,0,0.04); display:flex; justify-content:space-between;">
+                                    <span><?= h(strtoupper($r['name'])) ?></span>
+                                    <strong><?= (int)$r['cnt'] ?></strong>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <p style="margin-top: 1rem; color: #636e72; font-size: 0.9rem;">Dữ liệu hiển thị số lượng bài viết công khai theo thẻ (tag).</p>
                     </div>
                 </div>
+
+                <script>
+                    const communityChartLabels = <?= json_encode($chart_labels) ?>;
+                    const communityChartData = <?= json_encode($chart_data) ?>;
+                </script>
 
                 <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-grey); border-radius: 8px; text-align: center;">
                     <p style="margin: 0; color: #636e72;">
@@ -500,6 +532,7 @@ $all_posts = $stmt->fetchAll();
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="assets/js/index.js"></script>
 
     <footer style="text-align: center; padding: 2rem; margin-top: 3rem; background: var(--bg-grey); border-radius: 15px;">
