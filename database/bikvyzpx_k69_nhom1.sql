@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 27, 2025 at 08:46 AM
+-- Generation Time: Dec 29, 2025 at 09:31 AM
 -- Server version: 5.7.39
 -- PHP Version: 8.1.10
 
@@ -34,33 +34,6 @@ CREATE TABLE `attachments` (
   `file_type` varchar(50) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `categories`
---
-
-CREATE TABLE `categories` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `description` text,
-  `icon` varchar(50) DEFAULT '?',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `categories`
---
-
-INSERT INTO `categories` (`id`, `name`, `description`, `icon`, `created_at`) VALUES
-(1, '💻 Lập trình Web', 'HTML, CSS, JavaScript, PHP, Frameworks', '💻', '2025-12-27 04:36:47'),
-(2, '🗄️ Cơ sở dữ liệu', 'MySQL, MongoDB, SQL, Database Design', '🗄️', '2025-12-27 04:36:47'),
-(3, '🔐 Bảo mật Web', 'Security, Authentication, HTTPS, XSS, SQL Injection', '🔐', '2025-12-27 04:36:47'),
-(4, '🎨 Thiết kế UI/UX', 'Design, User Interface, User Experience', '🎨', '2025-12-27 04:36:47'),
-(5, '📱 Mobile Development', 'React Native, Flutter, Android, iOS', '📱', '2025-12-27 04:36:47'),
-(6, '🚀 DevOps & Deploy', 'Git, Docker, CI/CD, Server Management', '🚀', '2025-12-27 04:36:47'),
-(7, '💡 Thảo luận chung', 'Trao đổi, chia sẻ kinh nghiệm, hỏi đáp', '💡', '2025-12-27 04:36:47');
 
 -- --------------------------------------------------------
 
@@ -101,17 +74,6 @@ CREATE TABLE `comments` (
   `parent_id` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `comments`
---
-
-INSERT INTO `comments` (`id`, `post_id`, `user_id`, `content`, `parent_id`, `created_at`) VALUES
-(1, 1, 2, 'oke nha e', NULL, '2025-12-27 08:21:30'),
-(2, 1, 1, 'tốt e ơi', NULL, '2025-12-27 08:22:56'),
-(3, 1, 1, '1', NULL, '2025-12-27 08:25:52'),
-(4, 1, 4, 'vâng cô', 1, '2025-12-27 08:26:15'),
-(5, 1, 1, 'ok', NULL, '2025-12-27 08:30:04');
 
 -- --------------------------------------------------------
 
@@ -194,15 +156,6 @@ CREATE TABLE `likes` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `likes`
---
-
-INSERT INTO `likes` (`id`, `user_id`, `target_id`, `target_type`, `created_at`) VALUES
-(5, 2, 1, 'post', '2025-12-27 07:05:16'),
-(6, 4, 1, 'post', '2025-12-27 07:21:05'),
-(7, 1, 1, 'post', '2025-12-27 08:22:47');
-
 -- --------------------------------------------------------
 
 --
@@ -222,53 +175,6 @@ CREATE TABLE `notifications` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `notifications`
---
-
-INSERT INTO `notifications` (`id`, `user_id`, `actor_id`, `type`, `target_type`, `target_id`, `post_id`, `content`, `is_read`, `created_at`) VALUES
-(1, 4, 2, 'like', 'post', 1, 1, NULL, 1, '2025-12-27 07:05:16'),
-(2, 4, 1, 'like', 'post', 1, 1, NULL, 1, '2025-12-27 08:22:47'),
-(3, 2, 4, 'comment', 'comment', 1, 1, 'vâng cô', 0, '2025-12-27 08:26:15');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `polls`
---
-
-CREATE TABLE `polls` (
-  `id` int(11) NOT NULL,
-  `post_id` int(11) NOT NULL,
-  `question` varchar(500) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `poll_options`
---
-
-CREATE TABLE `poll_options` (
-  `id` int(11) NOT NULL,
-  `poll_id` int(11) NOT NULL,
-  `option_text` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `poll_votes`
---
-
-CREATE TABLE `poll_votes` (
-  `id` int(11) NOT NULL,
-  `option_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 -- --------------------------------------------------------
 
 --
@@ -278,7 +184,6 @@ CREATE TABLE `poll_votes` (
 CREATE TABLE `posts` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `category_id` int(11) DEFAULT NULL,
   `title` varchar(255) NOT NULL,
   `content` text NOT NULL,
   `tags` varchar(255) DEFAULT NULL,
@@ -292,8 +197,10 @@ CREATE TABLE `posts` (
 -- Dumping data for table `posts`
 --
 
-INSERT INTO `posts` (`id`, `user_id`, `category_id`, `title`, `content`, `tags`, `privacy`, `status`, `created_at`, `views`) VALUES
-(1, 4, 1, '1', '1', '#PHP,#HTML', 'public', 'unsolved', '2025-12-27 05:50:54', 56);
+INSERT INTO `posts` (`id`, `user_id`, `title`, `content`, `tags`, `privacy`, `status`, `created_at`, `views`) VALUES
+(16, 1, 'Kỹ thuật tối ưu HTML5', 'Nội dung về các thẻ semantic trong HTML5...', '#HTML5,#WebDesign', 'public', 'unsolved', '2025-12-29 09:23:25', 50),
+(17, 2, 'Quản lý Transaction trong MySQL', 'Cách sử dụng COMMIT và ROLLBACK...', '#MySQL,#Database', 'public', 'unsolved', '2025-12-29 09:23:25', 80),
+(18, 4, 'Phòng chống tấn công CSRF', 'Hướng dẫn sử dụng Token để bảo vệ form...', '#Security,#CSRF', 'public', 'solved', '2025-12-29 09:23:25', 120);
 
 -- --------------------------------------------------------
 
@@ -310,14 +217,6 @@ CREATE TABLE `tai_lieu` (
   `duong_dan_file` varchar(500) NOT NULL,
   `ngay_upload` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `tai_lieu`
---
-
-INSERT INTO `tai_lieu` (`id_tai_lieu`, `id_danh_muc`, `id_user`, `tieu_de`, `mo_ta`, `duong_dan_file`, `ngay_upload`) VALUES
-(2, 3, 2, 'Chương 1', 'Giải thuật tìm kiếm', '1766813573_694f6f8595538.pdf', '2025-12-27 05:32:53'),
-(3, 3, 1, 'Chương 2', 'Tìm kiếm nhị phân', '1766813666_694f6fe2f3413.pdf', '2025-12-27 05:34:26');
 
 -- --------------------------------------------------------
 
@@ -360,9 +259,17 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id_user`, `ho_ten`, `username`, `password`, `account_level`) VALUES
 (1, 'Nguyễn Văn A', 'nva', 'c4ca4238a0b923820dcc509a6f75849b', 1),
-(2, 'Admin', 'admin', 'c4ca4238a0b923820dcc509a6f75849b', 0),
-(3, 'Giảng Viên B', 'gvb', 'c4ca4238a0b923820dcc509a6f75849b', 1),
-(4, 'Sinh Viên C', 'svc', 'c4ca4238a0b923820dcc509a6f75849b', 2);
+(2, 'Quản trị viên', 'admin', 'c4ca4238a0b923820dcc509a6f75849b', 0),
+(4, 'Sinh viên C', 'svc', 'c4ca4238a0b923820dcc509a6f75849b', 2),
+(9, 'Trần Thị D', 'ttd_gv', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(10, 'Lê Văn E', 'lve_sv', 'e10adc3949ba59abbe56e057f20f883e', 2),
+(11, 'Phạm Hoàng F', 'phf_sv', 'e10adc3949ba59abbe56e057f20f883e', 2),
+(12, 'Hoàng Thị G', 'htg_gv', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(13, 'duy', 'duy', '123456', 2),
+(18, 'Trần Thị D', 'ttd_gv_new', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(19, 'Lê Văn E', 'lve_sv_new', 'e10adc3949ba59abbe56e057f20f883e', 2),
+(20, 'Phạm Hoàng F', 'phf_sv_new', 'e10adc3949ba59abbe56e057f20f883e', 2),
+(21, 'Nguyễn Văn G', 'nvg_admin_new', 'e10adc3949ba59abbe56e057f20f883e', 0);
 
 -- --------------------------------------------------------
 
@@ -379,18 +286,6 @@ CREATE TABLE `user_interests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `user_interests`
---
-
-INSERT INTO `user_interests` (`id`, `user_id`, `tag`, `score`, `updated_at`) VALUES
-(1, 4, '#PHP', 43, '2025-12-27 08:26:10'),
-(2, 4, '#HTML', 43, '2025-12-27 08:26:10'),
-(81, 2, '#PHP', 3, '2025-12-27 08:21:30'),
-(82, 2, '#HTML', 3, '2025-12-27 08:21:30'),
-(91, 1, '#PHP', 10, '2025-12-27 08:30:04'),
-(92, 1, '#HTML', 10, '2025-12-27 08:30:04');
-
---
 -- Indexes for dumped tables
 --
 
@@ -400,12 +295,6 @@ INSERT INTO `user_interests` (`id`, `user_id`, `tag`, `score`, `updated_at`) VAL
 ALTER TABLE `attachments`
   ADD PRIMARY KEY (`id`),
   ADD KEY `post_id` (`post_id`);
-
---
--- Indexes for table `categories`
---
-ALTER TABLE `categories`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `chu_de`
@@ -463,34 +352,11 @@ ALTER TABLE `notifications`
   ADD KEY `idx_user_read` (`user_id`,`is_read`,`created_at`);
 
 --
--- Indexes for table `polls`
---
-ALTER TABLE `polls`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `post_id` (`post_id`);
-
---
--- Indexes for table `poll_options`
---
-ALTER TABLE `poll_options`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `poll_id` (`poll_id`);
-
---
--- Indexes for table `poll_votes`
---
-ALTER TABLE `poll_votes`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_vote` (`option_id`,`user_id`),
-  ADD KEY `user_id` (`user_id`);
-
---
 -- Indexes for table `posts`
 --
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `category_id` (`category_id`),
   ADD KEY `created_at` (`created_at`),
   ADD KEY `tags` (`tags`);
 
@@ -535,76 +401,52 @@ ALTER TABLE `attachments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `categories`
---
-ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
 -- AUTO_INCREMENT for table `chu_de`
 --
 ALTER TABLE `chu_de`
-  MODIFY `id_chu_de` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `id_chu_de` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `danh_muc_tai_lieu`
 --
 ALTER TABLE `danh_muc_tai_lieu`
-  MODIFY `id_danh_muc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_danh_muc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `khoa_hoc`
 --
 ALTER TABLE `khoa_hoc`
-  MODIFY `id_khoa_hoc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_khoa_hoc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `khoa_hoc_chi_tiet`
 --
 ALTER TABLE `khoa_hoc_chi_tiet`
-  MODIFY `id_khoa_hoc_chi_tiet` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=157;
+  MODIFY `id_khoa_hoc_chi_tiet` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `polls`
---
-ALTER TABLE `polls`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `poll_options`
---
-ALTER TABLE `poll_options`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `poll_votes`
---
-ALTER TABLE `poll_votes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `tai_lieu`
@@ -616,13 +458,13 @@ ALTER TABLE `tai_lieu`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4266;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `user_interests`
 --
 ALTER TABLE `user_interests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
 
 --
 -- Constraints for dumped tables
@@ -657,30 +499,10 @@ ALTER TABLE `notifications`
   ADD CONSTRAINT `notifications_ibfk_3` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `polls`
---
-ALTER TABLE `polls`
-  ADD CONSTRAINT `polls_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `poll_options`
---
-ALTER TABLE `poll_options`
-  ADD CONSTRAINT `poll_options_ibfk_1` FOREIGN KEY (`poll_id`) REFERENCES `polls` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `poll_votes`
---
-ALTER TABLE `poll_votes`
-  ADD CONSTRAINT `poll_votes_ibfk_1` FOREIGN KEY (`option_id`) REFERENCES `poll_options` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `poll_votes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id_user`) ON DELETE CASCADE;
-
---
 -- Constraints for table `posts`
 --
 ALTER TABLE `posts`
-  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id_user`) ON DELETE CASCADE,
-  ADD CONSTRAINT `posts_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id_user`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `tai_lieu`

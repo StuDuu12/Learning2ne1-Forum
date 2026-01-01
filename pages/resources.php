@@ -1,410 +1,415 @@
 <?php
+session_start();
 require_once '../config.php';
 require_once '../includes/functions.php';
 
-if (!isLoggedIn()) {
-    header('Location: login.php');
-    exit;
+$message = '';
+$message_type = '';
+
+if (isset($_SESSION['uploaded'])) {
+    $message = $_SESSION['uploaded'];
+    $message_type = 'success';
+    unset($_SESSION['uploaded']);
 }
 
-$current_user = getCurrentUser($pdo);
-if (!$current_user) {
-    header('Location: login.php');
-    exit;
-}
-$can_upload = ($current_user['account_level'] <= 1); // Admin or Teacher
-
-// Handle category creation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_category']) && $can_upload) {
-    $ten_danh_muc = trim($_POST['ten_danh_muc']);
-
-    if (empty($ten_danh_muc)) {
-        $error = "Vui lòng nhập tên danh mục";
-    } else {
-        $stmt = $pdo->prepare("INSERT INTO danh_muc_tai_lieu (ten_danh_muc) VALUES (?)");
-        if ($stmt->execute([$ten_danh_muc])) {
-            $success = "Tạo danh mục thành công!";
-            // Refresh categories
-            header("Location: resources.php");
-            exit;
-        } else {
-            $error = "Có lỗi khi tạo danh mục";
-        }
-    }
-}
-
-// Handle category deletion
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_category']) && $can_upload) {
-    $id_danh_muc = (int)$_POST['id_danh_muc'];
-
-    // Check if category has resources
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM tai_lieu WHERE id_danh_muc = ?");
-    $stmt->execute([$id_danh_muc]);
-    $result = $stmt->fetch();
-
-    if ($result['count'] > 0) {
-        $error = "Không thể xóa danh mục đang có tài liệu. Vui lòng xóa tài liệu trước.";
-    } else {
-        $stmt = $pdo->prepare("DELETE FROM danh_muc_tai_lieu WHERE id_danh_muc = ?");
-        if ($stmt->execute([$id_danh_muc])) {
-            $success = "Xóa danh mục thành công!";
-            header("Location: resources.php");
-            exit;
-        } else {
-            $error = "Có lỗi khi xóa danh mục";
-        }
-    }
-}
-
-// Handle file upload
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_resource']) && $can_upload) {
-    $tieu_de = trim($_POST['tieu_de']);
-    $mo_ta = trim($_POST['mo_ta']);
-    $id_danh_muc = (int)$_POST['id_danh_muc'];
-
-    if (empty($tieu_de) || empty($id_danh_muc)) {
-        $error = "Vui lòng điền đầy đủ thông tin";
-    } elseif (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
-        $error = "Vui lòng chọn file để upload";
-    } else {
-        $file = $_FILES['file'];
-        $allowed_extensions = ['pdf', 'docx', 'doc', 'zip', 'pptx', 'ppt', 'xlsx', 'xls', 'txt', 'rar'];
-        $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-        if (!in_array($file_extension, $allowed_extensions)) {
-            $error = "Chỉ chấp nhận file: " . implode(', ', $allowed_extensions);
-        } else {
-            // Create upload directory if not exists
-            $upload_dir = '../uploads/resources/';
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-
-            // Generate unique filename
-            $filename = time() . '_' . uniqid() . '.' . $file_extension;
-            $filepath = $upload_dir . $filename;
-
-            if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                // Save to database
-                $stmt = $pdo->prepare("
-                    INSERT INTO tai_lieu (id_danh_muc, id_user, tieu_de, mo_ta, duong_dan_file, ngay_upload) 
-                    VALUES (?, ?, ?, ?, ?, NOW())
-                ");
-                if ($stmt->execute([$id_danh_muc, $_SESSION['user_id'], $tieu_de, $mo_ta, $filename])) {
-                    $success = "Upload tài liệu thành công!";
-                } else {
-                    $error = "Có lỗi khi lưu vào database";
-                    unlink($filepath); // Delete uploaded file
-                }
-            } else {
-                $error = "Có lỗi khi upload file";
-            }
-        }
-    }
-}
-
-// Handle file deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_resource'])) {
-    $id_tai_lieu = (int)$_POST['id_tai_lieu'];
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit;
+    }
 
-    // Check permission
+    $resource_id = (int)$_POST['resource_id'];
     $stmt = $pdo->prepare("SELECT * FROM tai_lieu WHERE id_tai_lieu = ?");
-    $stmt->execute([$id_tai_lieu]);
-    $resource = $stmt->fetch();
+    $stmt->execute([$resource_id]);
+    $res = $stmt->fetch();
 
-    if ($resource && ($resource['id_user'] == $_SESSION['user_id'] || $current_user['account_level'] == 0)) {
-        // Delete file
-        $filepath = '../uploads/resources/' . $resource['duong_dan_file'];
-        if (file_exists($filepath)) {
-            unlink($filepath);
+    if ($res) {
+        $canDelete = false;
+        if ($_SESSION['user_id'] == $res['id_user']) {
+            $canDelete = true;
+        }
+        if (isset($_SESSION['account_level']) && $_SESSION['account_level'] == 0) {
+            $canDelete = true;
         }
 
-        // Delete from database
-        $stmt = $pdo->prepare("DELETE FROM tai_lieu WHERE id_tai_lieu = ?");
-        if ($stmt->execute([$id_tai_lieu])) {
-            $success = "Xóa tài liệu thành công!";
+        if ($canDelete) {
+            $filePath = __DIR__ . '/../' . $res['duong_dan_file'];
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+            $stmt = $pdo->prepare("DELETE FROM tai_lieu WHERE id_tai_lieu = ?");
+            $stmt->execute([$resource_id]);
+            $message = 'Đã xóa tài liệu thành công!';
+            $message_type = 'success';
         } else {
-            $error = "Có lỗi khi xóa tài liệu";
+            $message = 'Bạn không có quyền xóa tài liệu này!';
+            $message_type = 'error';
         }
-    } else {
-        $error = "Bạn không có quyền xóa tài liệu này";
     }
 }
 
-// Get all categories
-$stmt = $pdo->query("SELECT * FROM danh_muc_tai_lieu ORDER BY ten_danh_muc ASC");
-$categories = $stmt->fetchAll();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['resource_file'])) {
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit;
+    }
 
-// Get selected category (default to first)
-$selected_category = isset($_GET['category']) ? (int)$_GET['category'] : ($categories[0]['id_danh_muc'] ?? 0);
+    $title = trim($_POST['title'] ?? 'Tài liệu không tên');
+    $description = trim($_POST['description'] ?? '');
+    $category = trim($_POST['category'] ?? 'Khác');
+    $topic = trim($_POST['topic'] ?? '');
 
-// Get resources by category
-if ($selected_category > 0) {
-    $stmt = $pdo->prepare("
-        SELECT t.*, u.ho_ten, u.account_level
-        FROM tai_lieu t
-        JOIN user u ON t.id_user = u.id_user
-        WHERE t.id_danh_muc = ?
-        ORDER BY t.ngay_upload DESC
-    ");
-    $stmt->execute([$selected_category]);
-    $resources = $stmt->fetchAll();
+    if ($_FILES['resource_file']['error'] == 0) {
+        $max_size = 100 * 1024 * 1024;
+        if ($_FILES['resource_file']['size'] > $max_size) {
+            $message = "File quá lớn (tối đa 100MB).";
+            $message_type = 'error';
+        } else {
+            $target_dir = "../uploads/resources/";
+            if (!is_dir($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+
+            $filename = time() . "_" . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($_FILES["resource_file"]["name"]));
+            $target_file = $target_dir . $filename;
+
+            if (move_uploaded_file($_FILES["resource_file"]["tmp_name"], $target_file)) {
+                $file_path = "uploads/resources/" . $filename;
+
+                $full_description = '';
+                if (!empty($category)) {
+                    $full_description .= '[CATEGORY:' . $category . ']';
+                }
+                if (!empty($topic)) {
+                    $full_description .= '[TOPIC:' . $topic . ']';
+                }
+                if (!empty($description)) {
+                    $full_description .= ' ' . $description;
+                }
+
+                $id_danh_muc = 1;
+                $stmt = $pdo->prepare("INSERT INTO tai_lieu (id_danh_muc, id_user, tieu_de, mo_ta, duong_dan_file, ngay_upload) VALUES (?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([$id_danh_muc, $_SESSION['user_id'], $title, trim($full_description), $file_path]);
+
+                $message = 'Upload tài liệu thành công!';
+                $message_type = 'success';
+            } else {
+                $message = "Không thể lưu file. Vui lòng thử lại.";
+                $message_type = 'error';
+            }
+        }
+    } else {
+        $message = "Vui lòng chọn file để upload.";
+        $message_type = 'error';
+    }
+}
+
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+$filterCategory = isset($_GET['category']) ? trim($_GET['category']) : '';
+$filterTopic = isset($_GET['topic']) ? trim($_GET['topic']) : '';
+
+$sql = "SELECT tl.*, u.username, u.ho_ten FROM tai_lieu tl JOIN user u ON tl.id_user = u.id_user WHERE 1=1";
+$params = [];
+
+if (!empty($search)) {
+    $sql .= " AND (tl.tieu_de LIKE ? OR tl.mo_ta LIKE ? OR u.username LIKE ?)";
+    $searchParam = "%$search%";
+    $params[] = $searchParam;
+    $params[] = $searchParam;
+    $params[] = $searchParam;
+}
+
+if (!empty($filterCategory)) {
+    $sql .= " AND tl.mo_ta LIKE ?";
+    $params[] = "%[CATEGORY:$filterCategory]%";
+}
+
+if (!empty($filterTopic)) {
+    $sql .= " AND tl.mo_ta LIKE ?";
+    $params[] = "%[TOPIC:$filterTopic]%";
+}
+
+if ($sort === 'oldest') {
+    $sql .= " ORDER BY tl.ngay_upload ASC";
 } else {
-    $resources = [];
+    $sql .= " ORDER BY tl.ngay_upload DESC";
 }
 
-// Get category name
-$category_name = '';
-if ($selected_category > 0) {
-    foreach ($categories as $cat) {
-        if ($cat['id_danh_muc'] == $selected_category) {
-            $category_name = $cat['ten_danh_muc'];
-            break;
+$stmtList = $pdo->prepare($sql);
+$stmtList->execute($params);
+$resources = $stmtList->fetchAll(PDO::FETCH_ASSOC);
+$totalResources = count($resources);
+
+$fileTypes = [];
+$allCategories = [];
+$allTopics = [];
+foreach ($resources as $res) {
+    $ext = strtolower(pathinfo($res['duong_dan_file'], PATHINFO_EXTENSION));
+    if (!isset($fileTypes[$ext])) {
+        $fileTypes[$ext] = 0;
+    }
+    $fileTypes[$ext]++;
+
+    if (preg_match('/\[CATEGORY:([^\]]+)\]/', $res['mo_ta'], $matches)) {
+        $cat = $matches[1];
+        if (!in_array($cat, $allCategories)) {
+            $allCategories[] = $cat;
+        }
+    }
+    if (preg_match('/\[TOPIC:([^\]]+)\]/', $res['mo_ta'], $matches)) {
+        $top = $matches[1];
+        if (!in_array($top, $allTopics)) {
+            $allTopics[] = $top;
         }
     }
 }
+arsort($fileTypes);
+sort($allCategories);
+sort($allTopics);
 
-// File icon helper
-function getFileIcon($filename)
-{
-    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-    $icons = [
-        'pdf' => '📄',
-        'doc' => '📝',
-        'docx' => '📝',
-        'zip' => '🗜️',
-        'rar' => '🗜️',
-        'ppt' => '📊',
-        'pptx' => '📊',
-        'xls' => '📊',
-        'xlsx' => '📊',
-        'txt' => '📃'
-    ];
-    return $icons[$ext] ?? '📎';
-}
+$defaultCategories = ['Bài giảng', 'Tài liệu tham khảo', 'Đề thi', 'Bài tập', 'Slide', 'Ebook', 'Video', 'Khác'];
 
-function formatFileSize($bytes)
+function parseResourceMeta($mo_ta)
 {
-    if ($bytes >= 1073741824) {
-        return number_format($bytes / 1073741824, 2) . ' GB';
-    } elseif ($bytes >= 1048576) {
-        return number_format($bytes / 1048576, 2) . ' MB';
-    } elseif ($bytes >= 1024) {
-        return number_format($bytes / 1024, 2) . ' KB';
-    } else {
-        return $bytes . ' bytes';
+    $category = '';
+    $topic = '';
+    $description = $mo_ta;
+
+    if (preg_match('/\[CATEGORY:([^\]]+)\]/', $mo_ta, $matches)) {
+        $category = $matches[1];
+        $description = str_replace($matches[0], '', $description);
     }
+    if (preg_match('/\[TOPIC:([^\]]+)\]/', $mo_ta, $matches)) {
+        $topic = $matches[1];
+        $description = str_replace($matches[0], '', $description);
+    }
+
+    return [
+        'category' => $category,
+        'topic' => $topic,
+        'description' => trim($description)
+    ];
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chia sẻ tài liệu - Diễn đàn Sinh viên</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/resources.css">
+    <title>Kho Tài Liệu Học Tập</title>
+    <link rel="stylesheet" href="../assets/css/base.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../assets/css/resources.css?v=<?php echo time(); ?>">
+    <link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
 </head>
 
 <body>
     <?php include '../includes/navbar.php'; ?>
 
-    <div class="resources-container">
-        <!-- Sidebar: Categories -->
-        <aside class="sidebar">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="margin: 0;">📚 Danh mục</h3>
-                <?php if ($can_upload): ?>
-                    <button onclick="document.getElementById('createCategoryModal').style.display='flex'"
-                        style="background: var(--primary-mint); color: white; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                        ➕
-                    </button>
-                <?php endif; ?>
+    <div class="resources-page">
+        <div class="page-header">
+            <h1><i class='bx bx-book-open'></i> Kho Tài Liệu Học Tập</h1>
+            <p style="color: #636e72;">Chia sẻ và tải về tài liệu học tập miễn phí</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <i class='bx bx-file'></i> Tổng số: <strong><?= $totalResources ?></strong> tài liệu
             </div>
-            <ul class="category-list">
-                <?php foreach ($categories as $cat): ?>
-                    <li class="category-item">
-                        <a href="?category=<?= $cat['id_danh_muc'] ?>"
-                            class="category-link <?= $selected_category == $cat['id_danh_muc'] ? 'active' : '' ?>">
-                            <?= htmlspecialchars($cat['ten_danh_muc']) ?>
-                        </a>
-                        <?php if ($can_upload): ?>
-                            <form method="POST" onsubmit="return confirm('Xác nhận xóa danh mục này?')">
-                                <input type="hidden" name="id_danh_muc" value="<?= $cat['id_danh_muc'] ?>">
-                                <button type="submit" name="delete_category"
-                                    style="background: none; border: none; color: #e74c3c; cursor: pointer; padding: 0.5rem; font-size: 1rem;"
-                                    title="Xóa danh mục">
-                                    🗑️
-                                </button>
-                            </form>
-                        <?php endif; ?>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </aside>
+            <?php foreach (array_slice($fileTypes, 0, 4, true) as $ext => $count): ?>
+                <div class="stat-item">
+                    <i class='bx bx-file-blank'></i> <?= strtoupper($ext) ?>: <strong><?= $count ?></strong>
+                </div>
+            <?php endforeach; ?>
+        </div>
 
-        <!-- Main Content: Resources Grid -->
-        <main class="content-area">
-            <?php if (isset($success)): ?>
-                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-            <?php endif; ?>
-
-            <?php if (isset($error)): ?>
-                <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-
-            <div class="content-header">
-                <h2><?= $category_name ? htmlspecialchars($category_name) : 'Chọn danh mục' ?></h2>
-                <?php if ($can_upload): ?>
-                    <button class="btn-upload" onclick="openUploadModal()">
-                        ➕ Upload tài liệu
-                    </button>
+        <div class="filter-section">
+            <h4><i class='bx bx-filter-alt'></i> Tìm kiếm & Lọc tài liệu</h4>
+            <form method="GET" class="filter-grid">
+                <div class="filter-group">
+                    <label>Từ khóa</label>
+                    <input type="text" name="search" placeholder="Tìm theo tên, mô tả..." value="<?= h($search) ?>">
+                </div>
+                <div class="filter-group">
+                    <label>Danh mục</label>
+                    <select name="category">
+                        <option value="">Tất cả danh mục</option>
+                        <?php foreach ($defaultCategories as $cat): ?>
+                            <option value="<?= h($cat) ?>" <?= $filterCategory === $cat ? 'selected' : '' ?>><?= h($cat) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Chủ đề</label>
+                    <input type="text" name="topic" placeholder="Nhập chủ đề..." value="<?= h($filterTopic) ?>">
+                </div>
+                <div class="filter-group">
+                    <label>Sắp xếp</label>
+                    <select name="sort">
+                        <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Mới nhất</option>
+                        <option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>>Cũ nhất</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-filter">
+                    <i class='bx bx-search'></i> Tìm kiếm
+                </button>
+                <?php if (!empty($search) || !empty($filterCategory) || !empty($filterTopic)): ?>
+                    <a href="resources.php" class="btn-clear">
+                        <i class='bx bx-x'></i> Xóa lọc
+                    </a>
                 <?php endif; ?>
-            </div>
+            </form>
 
-            <?php if (empty($resources)): ?>
-                <div class="empty-state">
-                    <div class="empty-state-icon">📭</div>
-                    <p>Chưa có tài liệu nào trong danh mục này</p>
-                </div>
-            <?php else: ?>
-                <div class="resources-grid">
-                    <?php foreach ($resources as $resource): ?>
-                        <div class="resource-card">
-                            <div class="resource-icon">
-                                <?= getFileIcon($resource['duong_dan_file']) ?>
-                            </div>
-                            <h3 class="resource-title"><?= htmlspecialchars($resource['tieu_de']) ?></h3>
-
-                            <?php if ($resource['mo_ta']): ?>
-                                <p class="resource-meta"><?= htmlspecialchars($resource['mo_ta']) ?></p>
-                            <?php endif; ?>
-
-                            <div class="resource-uploader">
-                                <span>👤 <?= htmlspecialchars($resource['ho_ten']) ?></span>
-                                <?php
-                                $role_class = ['badge-admin', 'badge-teacher', 'badge-student'][$resource['account_level']] ?? 'badge-student';
-                                $role_name = ['Admin', 'GV', 'SV'][$resource['account_level']] ?? 'SV';
-                                ?>
-                                <span class="uploader-badge <?= $role_class ?>"><?= $role_name ?></span>
-                            </div>
-
-                            <div class="resource-meta">
-                                📅 <?= date('d/m/Y', strtotime($resource['ngay_upload'])) ?>
-                            </div>
-
-                            <?php
-                            $filepath = '../uploads/resources/' . $resource['duong_dan_file'];
-                            if (file_exists($filepath)) {
-                                $filesize = formatFileSize(filesize($filepath));
-                                echo '<div class="resource-meta">💾 ' . $filesize . '</div>';
-                            }
-                            ?>
-
-                            <div class="resource-actions">
-                                <a href="../uploads/resources/<?= urlencode($resource['duong_dan_file']) ?>"
-                                    download
-                                    class="btn-download">
-                                    ⬇️ Tải xuống
-                                </a>
-
-                                <?php if ($resource['id_user'] == $_SESSION['user_id'] || $current_user['account_level'] == 0): ?>
-                                    <form method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa tài liệu này?')" style="margin: 0;">
-                                        <input type="hidden" name="id_tai_lieu" value="<?= $resource['id_tai_lieu'] ?>">
-                                        <button type="submit" name="delete_resource" class="btn-delete">🗑️</button>
-                                    </form>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </main>
-    </div>
-
-    <!-- Upload Modal -->
-    <?php if ($can_upload): ?>
-        <div class="modal" id="uploadModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>📤 Upload tài liệu mới</h3>
-                    <button class="close-modal" onclick="closeUploadModal()">&times;</button>
-                </div>
-
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="tieu_de">Tiêu đề *</label>
-                        <input type="text" id="tieu_de" name="tieu_de" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="mo_ta">Mô tả</label>
-                        <textarea id="mo_ta" name="mo_ta"></textarea>
-                    </div>
-
-                    <?php if ($selected_category > 0): ?>
-                        <!-- Danh mục đã được chọn từ URL -->
-                        <div style="background: linear-gradient(135deg, var(--primary-mint) 0%, #2ecc71 100%); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                            <strong>Danh mục:</strong> <?= htmlspecialchars($category_name) ?>
-                            <input type="hidden" name="id_danh_muc" value="<?= $selected_category ?>">
-                        </div>
-                    <?php else: ?>
-                        <!-- Hiển thị dropdown chọn danh mục -->
-                        <div class="form-group">
-                            <label for="id_danh_muc">Danh mục *</label>
-                            <select id="id_danh_muc" name="id_danh_muc" required>
-                                <option value="">-- Chọn danh mục --</option>
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= $cat['id_danh_muc'] ?>">
-                                        <?= htmlspecialchars($cat['ten_danh_muc']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+            <?php if (!empty($search) || !empty($filterCategory) || !empty($filterTopic)): ?>
+                <div class="active-filters">
+                    <?php if (!empty($search)): ?>
+                        <span class="filter-tag"><i class='bx bx-search'></i> "<?= h($search) ?>"</span>
                     <?php endif; ?>
-
-                    <div class="form-group">
-                        <label for="file">File tài liệu *</label>
-                        <input type="file" id="file" name="file" required
-                            accept=".pdf,.doc,.docx,.zip,.rar,.ppt,.pptx,.xls,.xlsx,.txt">
-                        <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
-                            Chấp nhận: PDF, DOC, DOCX, ZIP, RAR, PPT, PPTX, XLS, XLSX, TXT
-                        </small>
-                    </div>
-
-                    <button type="submit" name="upload_resource" class="btn-upload" style="width: 100%;">
-                        ✓ Upload
-                    </button>
-                </form>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <!-- Create Category Modal -->
-    <?php if ($can_upload): ?>
-        <div class="modal" id="createCategoryModal" style="display: none;">
-            <div class="modal-content" style="max-width: 500px;">
-                <div class="modal-header">
-                    <h3>➕ Tạo danh mục mới</h3>
-                    <button class="close-modal" onclick="document.getElementById('createCategoryModal').style.display='none'">&times;</button>
+                    <?php if (!empty($filterCategory)): ?>
+                        <span class="filter-tag"><i class='bx bx-category'></i> <?= h($filterCategory) ?></span>
+                    <?php endif; ?>
+                    <?php if (!empty($filterTopic)): ?>
+                        <span class="filter-tag"><i class='bx bx-book'></i> <?= h($filterTopic) ?></span>
+                    <?php endif; ?>
                 </div>
+            <?php endif; ?>
+        </div>
 
-                <form method="POST">
+        <?php if ($message): ?>
+            <div class="alert alert-<?= $message_type ?>">
+                <i class='bx bx-<?= $message_type === 'success' ? 'check-circle' : 'error-circle' ?>'></i>
+                <?= htmlspecialchars($message) ?>
+            </div>
+        <?php endif; ?>
+
+
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <div class="upload-section">
+                <h3><i class='bx bx-cloud-upload'></i> Chia sẻ tài liệu mới</h3>
+                <form method="POST" enctype="multipart/form-data" class="upload-form">
                     <div class="form-group">
-                        <label for="ten_danh_muc">Tên danh mục *</label>
-                        <input type="text" id="ten_danh_muc" name="ten_danh_muc" required placeholder="Ví dụ: Lập trình Python">
+                        <label><i class='bx bx-edit'></i> Tên tài liệu *</label>
+                        <input type="text" name="title" required placeholder="Nhập tên tài liệu">
                     </div>
-
-                    <button type="submit" name="create_category" class="btn-upload" style="width: 100%; background: var(--primary-mint); color: white; padding: 0.75rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                        ✓ Tạo danh mục
-                    </button>
+                    <div class="form-group">
+                        <label><i class='bx bx-file'></i> Chọn file *</label>
+                        <input type="file" name="resource_file" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class='bx bx-category'></i> Danh mục</label>
+                        <select name="category">
+                            <option value="">-- Chọn danh mục --</option>
+                            <?php foreach ($defaultCategories as $cat): ?>
+                                <option value="<?= h($cat) ?>"><?= h($cat) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class='bx bx-book'></i> Chủ đề</label>
+                        <input type="text" name="topic" placeholder="VD: Lập trình PHP, Cơ sở dữ liệu...">
+                    </div>
+                    <div class="form-group full-width">
+                        <label><i class='bx bx-text'></i> Mô tả ngắn</label>
+                        <textarea name="description" rows="2" placeholder="Mô tả nội dung tài liệu..."></textarea>
+                    </div>
+                    <div class="full-width" style="text-align: right;">
+                        <button type="submit" class="btn-upload">
+                            <i class='bx bx-upload'></i> Upload tài liệu
+                        </button>
+                    </div>
                 </form>
             </div>
-        </div>
-    <?php endif; ?>
+        <?php else: ?>
+            <div class="login-prompt">
+                <p style="margin: 0; color: #2d3436; font-size: 1.05rem;">
+                    <i class='bx bx-lock' style="color: var(--primary-mint);"></i>
+                    <a href="login.php">Đăng nhập</a> để chia sẻ tài liệu của bạn!
+                </p>
+            </div>
+        <?php endif; ?>
 
-    <script src="../assets/js/resources.js"></script>
+
+        <?php if (empty($resources)): ?>
+            <div class="empty-state">
+                <i class='bx bx-folder-open'></i>
+                <h3>Chưa có tài liệu nào</h3>
+                <p>Hãy là người đầu tiên chia sẻ tài liệu!</p>
+            </div>
+        <?php else: ?>
+            <div class="resources-grid">
+                <?php foreach ($resources as $res): ?>
+                    <?php
+                    $ext = strtolower(pathinfo($res['duong_dan_file'], PATHINFO_EXTENSION));
+                    $iconColor = '#00d2d3';
+                    $iconName = 'bx-file';
+                    if ($ext === 'pdf') {
+                        $iconColor = '#e74c3c';
+                        $iconName = 'bxs-file-pdf';
+                    } elseif (in_array($ext, ['doc', 'docx'])) {
+                        $iconColor = '#3498db';
+                        $iconName = 'bxs-file-doc';
+                    } elseif (in_array($ext, ['xls', 'xlsx'])) {
+                        $iconColor = '#27ae60';
+                        $iconName = 'bx-table';
+                    } elseif (in_array($ext, ['ppt', 'pptx'])) {
+                        $iconColor = '#e67e22';
+                        $iconName = 'bxs-slideshow';
+                    } elseif (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                        $iconColor = '#9b59b6';
+                        $iconName = 'bx-image';
+                    } elseif (in_array($ext, ['zip', 'rar', '7z'])) {
+                        $iconColor = '#f39c12';
+                        $iconName = 'bx-archive';
+                    } elseif (in_array($ext, ['mp4', 'avi', 'mkv', 'mov'])) {
+                        $iconColor = '#e91e63';
+                        $iconName = 'bx-video';
+                    }
+
+                    $meta = parseResourceMeta($res['mo_ta']);
+                    ?>
+                    <div class="resource-card">
+                        <div class="resource-header">
+                            <div class="resource-info">
+                                <div class="resource-icon" style="background: <?= $iconColor ?>15; color: <?= $iconColor ?>;">
+                                    <?= strtoupper($ext) ?>
+                                </div>
+                                <div class="resource-title"><?= htmlspecialchars($res['tieu_de']); ?></div>
+                                <div class="resource-tags">
+                                    <?php if (!empty($meta['category'])): ?>
+                                        <span class="resource-tag"><i class='bx bx-category'></i> <?= h($meta['category']) ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($meta['topic'])): ?>
+                                        <span class="resource-tag topic"><i class='bx bx-book'></i> <?= h($meta['topic']) ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if (!empty($meta['description'])): ?>
+                            <div class="resource-desc"><?= htmlspecialchars($meta['description']); ?></div>
+                        <?php endif; ?>
+                        <div class="resource-meta">
+                            <span><i class='bx bx-user'></i> <?= htmlspecialchars($res['ho_ten'] ?? $res['username']); ?></span>
+                            <span><i class='bx bx-calendar'></i> <?= date('d/m/Y H:i', strtotime($res['ngay_upload'])) ?></span>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="../<?= $res['duong_dan_file']; ?>" class="btn-download" target="_blank">
+                                <i class='bx bx-download'></i> Tải xuống
+                            </a>
+                            <?php if (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $res['id_user'] || (isset($_SESSION['account_level']) && $_SESSION['account_level'] == 0))): ?>
+                                <form method="POST" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn xóa tài liệu này?');">
+                                    <input type="hidden" name="resource_id" value="<?= $res['id_tai_lieu'] ?>">
+                                    <button type="submit" name="delete_resource" class="btn-delete-res">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
 </body>
 
 </html>

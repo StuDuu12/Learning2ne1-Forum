@@ -68,6 +68,44 @@
     margin-bottom: 1rem;
 }
 
+
+.create-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1rem;
+}
+
+.create-grid .col-span-2 {
+    grid-column: 1 / span 2;
+}
+
+.create-grid .button-group {
+    grid-column: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.create-grid .button-group .btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+}
+
+@media (max-width: 768px) {
+    .create-grid {
+        grid-template-columns: 1fr;
+    }
+    .create-grid .col-span-2,
+    .create-grid .button-group {
+        grid-column: auto;
+    }
+    .create-grid .button-group {
+        justify-content: flex-start;
+    }
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -199,4 +237,67 @@ select.role-select {
     padding: 0.5rem;
     border-radius: 6px;
     border: 1px solid #ddd;
+}
+
+.search-filter {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-filter input[type='text'] {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--bg-grey);
+    border-radius: 8px;
+}
+
+.search-filter select {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--bg-grey);
+    border-radius: 8px;
+    background: white;
+}
+
+.role-select {
+    padding: 0.4rem 0.75rem;
+    border: 2px solid #dfe6e9;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    background: white;
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: var(--primary-mint);
+}
+
+.btn-save-role {
+    padding: 0.4rem 0.75rem;
+    background: var(--primary-mint);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.btn-save-role:hover {
+    background: #00a37a;
+}
+
+.current-user-row {
+    background: #fff9e6 !important;
+}
+
+.user-actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
 }

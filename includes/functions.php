@@ -86,7 +86,7 @@ function getTrending($pdo, $limit = 5)
 function getSuggested($pdo, $user_id = null, $limit = 10)
 {
     if ($user_id) {
-        // Get user's top interest tag
+
         $stmt = $pdo->prepare("
             SELECT tag FROM user_interests 
             WHERE user_id = ? 
@@ -97,7 +97,7 @@ function getSuggested($pdo, $user_id = null, $limit = 10)
         $top_interest = $stmt->fetchColumn();
 
         if ($top_interest) {
-            // Find posts matching top interest
+
             $stmt = $pdo->prepare("
                 SELECT p.*, u.ho_ten, u.username,
                        COUNT(DISTINCT c.id) as comment_count
@@ -116,7 +116,7 @@ function getSuggested($pdo, $user_id = null, $limit = 10)
         }
     }
 
-    // Default: return latest public posts
+
     $stmt = $pdo->prepare("
         SELECT p.*, u.ho_ten, u.username,
                COUNT(DISTINCT c.id) as comment_count
@@ -175,11 +175,11 @@ function trackInterests($pdo, $user_id, $tags_string)
 {
     if (!$tags_string) return;
 
-    // Kiểm tra user có tồn tại không
+
     $stmt = $pdo->prepare("SELECT id_user FROM user WHERE id_user = ?");
     $stmt->execute([$user_id]);
     if (!$stmt->fetch()) {
-        return; // User không tồn tại, bỏ qua
+        return;
     }
 
     $tags = explode(',', $tags_string);
@@ -187,7 +187,7 @@ function trackInterests($pdo, $user_id, $tags_string)
         $tag = trim($tag);
         if (!$tag) continue;
 
-        // Insert or update interest score
+
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO user_interests (user_id, tag, score) 
@@ -196,7 +196,7 @@ function trackInterests($pdo, $user_id, $tags_string)
             ");
             $stmt->execute([$user_id, $tag]);
         } catch (PDOException $e) {
-            // Bỏ qua lỗi foreign key nếu user bị xóa trong lúc đang xử lý
+
             continue;
         }
     }
@@ -208,11 +208,6 @@ function incrementViews($pdo, $post_id)
     $stmt->execute([$post_id]);
 }
 
-function formatMentions($content)
-{
-    // Alias
-    return parseMentions($content);
-}
 
 function getAttachments($pdo, $post_id)
 {
@@ -229,7 +224,7 @@ function getPoll($pdo, $post_id)
     $poll = $stmt->fetch();
 
     if ($poll) {
-        // Get poll options with vote counts
+
         $stmt = $pdo->prepare("
             SELECT po.*, COUNT(pv.id) as vote_count
             FROM poll_options po
@@ -290,19 +285,14 @@ function handleUpload($file)
         return ['success' => false, 'error' => 'Upload directory not configured'];
     }
 
-    $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
-    $max_size = 5 * 1024 * 1024; // 5MB
+    $max_size = 100 * 1024 * 1024;
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
         return ['success' => false, 'error' => 'Upload error'];
     }
 
     if ($file['size'] > $max_size) {
-        return ['success' => false, 'error' => 'File too large (max 5MB)'];
-    }
-
-    if (!in_array($file['type'], $allowed_types)) {
-        return ['success' => false, 'error' => 'Invalid file type'];
+        return ['success' => false, 'error' => 'File too large (max 100MB)'];
     }
 
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -318,15 +308,4 @@ function handleUpload($file)
     }
 
     return ['success' => false, 'error' => 'Failed to save file'];
-}
-
-function parseMentions($text)
-{
-    // Chuyển @username thành link đến profile với absolute path
-    $baseUrl = defined('BASE_URL') ? BASE_URL : '';
-    return preg_replace(
-        '/@([a-zA-Z0-9_]+)/',
-        '<a href="' . $baseUrl . '/pages/profile.php?username=$1" class="mention-link" style="color: var(--primary-mint); font-weight: 600; text-decoration: none;">@$1</a>',
-        $text
-    );
 }

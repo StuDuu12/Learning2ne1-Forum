@@ -1,14 +1,9 @@
-// Dashboard Charts - Data is loaded from dashboard.php via inline script tag
-
-// Get top 8 community tags
 const communityLabels = communityData.slice(0, 8).map((item) => item.tag);
 const communityValues = communityData.slice(0, 8).map((item) => parseInt(item.count));
 
-// Get top 8 personal tags
 const personalLabels = userData.slice(0, 8).map((item) => item.tag);
 const personalValues = userData.slice(0, 8).map((item) => parseInt(item.score));
 
-// Community Trends Chart
 const ctxCommunity = document.getElementById('communityChart').getContext('2d');
 const communityChart = new Chart(ctxCommunity, {
     type: 'bar',
@@ -85,7 +80,6 @@ const communityChart = new Chart(ctxCommunity, {
     },
 });
 
-// Personal Interests Chart
 const ctxPersonal = document.getElementById('personalChart').getContext('2d');
 const personalChart = new Chart(ctxPersonal, {
     type: 'bar',
