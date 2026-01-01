@@ -46,7 +46,6 @@
 .posts-section {
 }
 
-
 .posts-grid {
     display: grid;
     gap: 1.5rem;
@@ -107,7 +106,6 @@
     color: #636e72;
 }
 
-
 .post-status-container {
     display: flex;
     flex-direction: column;
@@ -145,7 +143,6 @@
     color: #2d3436;
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
-
 
 .post-privacy {
     padding: 0.35rem 0.85rem;
@@ -186,7 +183,6 @@
     font-size: 0.85rem;
 }
 
-
 .post-title {
     font-size: 1.25rem;
     font-weight: bold;
@@ -215,7 +211,6 @@
     color: var(--primary-mint);
     font-weight: 600;
 }
-
 
 .post-attachments {
     margin-bottom: 1rem;
@@ -269,103 +264,6 @@
     color: var(--primary-mint);
 }
 
-
-.poll-preview {
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-}
-
-.poll-title {
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--primary-mint);
-}
-
-.poll-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.poll-option {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 2px solid transparent;
-}
-
-.poll-option:hover {
-    border-color: var(--primary-mint);
-}
-
-.poll-option input[type='radio'] {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--primary-mint);
-}
-
-.poll-option-text {
-    flex: 1;
-}
-
-.poll-option-votes {
-    font-size: 0.85rem;
-    color: #636e72;
-}
-
-.poll-result {
-    padding: 0.5rem 0;
-}
-
-.poll-result-bar {
-    height: 8px;
-    background: var(--bg-grey);
-    border-radius: 4px;
-    margin-top: 0.5rem;
-    overflow: hidden;
-}
-
-.poll-result-fill {
-    height: 100%;
-    background: linear-gradient(135deg, var(--primary-mint) 0%, #00a37a 100%);
-    border-radius: 4px;
-    transition: width 0.5s ease;
-}
-
-.poll-vote-btn {
-    margin-top: 0.75rem;
-    padding: 0.5rem 1.5rem;
-    background: linear-gradient(135deg, var(--primary-mint) 0%, #00a37a 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.poll-vote-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 180, 148, 0.3);
-}
-
-.poll-total {
-    margin-top: 0.75rem;
-    font-size: 0.85rem;
-    color: #636e72;
-}
-
-
 .post-meta,
 .post-footer {
     display: flex;
@@ -412,7 +310,6 @@
     background: rgba(0, 191, 165, 0.1);
     color: var(--primary-mint);
 }
-
 
 .empty-posts {
     text-align: center;

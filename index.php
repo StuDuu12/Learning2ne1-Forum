@@ -1,31 +1,12 @@
 <?php
 require_once 'config.php';
 require_once 'includes/functions.php';
-require_once 'includes/helpers.php';
 
 $current_user = isLoggedIn() ? getCurrentUser($pdo) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if (!isLoggedIn()) {
         header("Location: pages/login.php");
-        exit;
-    }
-
-    if ($_POST['action'] === 'hide_post' && isset($_POST['post_id'])) {
-        $post_id = intval($_POST['post_id']);
-        if (!isset($_SESSION['hidden_posts'])) {
-            $_SESSION['hidden_posts'] = [];
-        }
-        if (!in_array($post_id, $_SESSION['hidden_posts'])) {
-            $_SESSION['hidden_posts'][] = $post_id;
-        }
-        header("Location: index.php#posts-section");
-        exit;
-    }
-
-    if ($_POST['action'] === 'unhide_all') {
-        $_SESSION['hidden_posts'] = [];
-        header("Location: index.php");
         exit;
     }
 
@@ -88,13 +69,6 @@ if (isLoggedIn()) {
     $stmt->execute();
 }
 $all_posts = $stmt->fetchAll();
-
-$hidden_posts = isset($_SESSION['hidden_posts']) ? $_SESSION['hidden_posts'] : [];
-if (!empty($hidden_posts)) {
-    $all_posts = array_filter($all_posts, function ($post) use ($hidden_posts) {
-        return !in_array($post['id'], $hidden_posts);
-    });
-}
 
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 if ($search_query !== '') {
@@ -308,20 +282,6 @@ if ($filter_sort === 'oldest') {
                     <i class='bx bx-trending-up'></i> Trending
                 </a>
             </div>
-
-            <?php if (isLoggedIn() && !empty($_SESSION['hidden_posts'])): ?>
-                <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: linear-gradient(135deg, #ffeaa7, #fdcb6e); border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
-                    <span style="color: #2d3436; font-weight: 600;">
-                        <i class='bx bx-hide'></i> Bạn đã ẩn <?= count($_SESSION['hidden_posts']) ?> bài viết
-                    </span>
-                    <form method="POST" style="margin: 0;">
-                        <input type="hidden" name="action" value="unhide_all">
-                        <button type="submit" style="padding: 0.4rem 0.8rem; background: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: #2d3436; transition: all 0.2s;">
-                            <i class='bx bx-show'></i> Hiện lại tất cả
-                        </button>
-                    </form>
-                </div>
-            <?php endif; ?>
         </div>
 
         <?php if ($current_tab === 'all'): ?>
@@ -452,15 +412,6 @@ if ($filter_sort === 'oldest') {
                                 <a href="pages/post.php?id=<?= $post['id'] ?>#comments" class="btn-action btn-comment" style="text-decoration: none;">
                                     <i class='bx bx-message'></i> <?= $post['comment_count'] ?? 0 ?>
                                 </a>
-                                <?php if (isLoggedIn()): ?>
-                                    <form method="POST" style="display: inline; margin-left: auto;">
-                                        <input type="hidden" name="action" value="hide_post">
-                                        <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                        <button type="submit" class="btn-action btn-hide" title="Ẩn bài viết này">
-                                            <i class='bx bx-hide'></i>
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -580,15 +531,6 @@ if ($filter_sort === 'oldest') {
                                 <a href="pages/post.php?id=<?= $post['id'] ?>#comments" class="btn-action btn-comment" style="text-decoration: none;">
                                     <i class='bx bx-message'></i> <?= $post['comment_count'] ?? 0 ?>
                                 </a>
-                                <?php if (isLoggedIn()): ?>
-                                    <form method="POST" style="display: inline; margin-left: auto;">
-                                        <input type="hidden" name="action" value="hide_post">
-                                        <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                        <button type="submit" class="btn-action btn-hide" title="Ẩn bài viết này">
-                                            <i class='bx bx-hide'></i>
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>

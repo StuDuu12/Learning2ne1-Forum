@@ -1,7 +1,6 @@
 <?php
 require_once '../config.php';
 require_once '../includes/functions.php';
-require_once '../includes/helpers.php';
 
 $username = isset($_GET['username']) ? trim($_GET['username']) : '';
 if ($username === '') {

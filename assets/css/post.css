@@ -183,49 +183,6 @@ html {
     box-shadow: var(--shadow);
 }
 
-.poll-section {
-    background: var(--bg-grey);
-    padding: 1.5rem;
-    border-radius: 12px;
-    margin: 2rem 0;
-}
-
-.poll-title {
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-dark);
-}
-
-.poll-option {
-    background: white;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.poll-option:hover {
-    transform: translateX(5px);
-}
-
-.poll-progress {
-    flex: 1;
-    height: 8px;
-    background: var(--bg-grey);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.poll-progress-bar {
-    height: 100%;
-    background: var(--primary-mint);
-    transition: width 0.3s;
-}
-
 .interaction-bar {
     display: flex;
     gap: 1rem;
@@ -902,63 +859,6 @@ html {
 
 .post-image-item img:hover {
     transform: scale(1.02);
-}
-
-.poll-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 1.5rem 0;
-    border-left: 4px solid var(--primary-mint);
-}
-
-.poll-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--primary-mint);
-    margin-bottom: 1rem;
-}
-
-.poll-option-btn {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1rem;
-    margin: 0.5rem 0;
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 2px solid #dfe6e9;
-    width: 100%;
-    text-align: left;
-}
-
-.poll-option-btn:hover {
-    border-color: var(--primary-mint);
-    transform: translateX(5px);
-}
-
-.poll-result {
-    padding: 0.75rem 1rem;
-    margin: 0.5rem 0;
-    background: white;
-    border-radius: 8px;
-    border: 2px solid var(--primary-mint);
-}
-
-.poll-progress {
-    height: 8px;
-    background: #e9ecef;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: 0.5rem;
-}
-
-.poll-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-mint), #2ecc71);
-    transition: width 0.5s ease;
 }
 
 .edit-form-inline {

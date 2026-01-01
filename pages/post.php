@@ -1,7 +1,6 @@
 <?php
 require_once '../config.php';
 require_once '../includes/functions.php';
-require_once '../includes/helpers.php';
 
 $post_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $current_user = getCurrentUser($pdo);
