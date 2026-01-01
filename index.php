@@ -46,32 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         $params = $_GET;
         $query_string = http_build_query($params);
-        $redirect_url = 'index.php' . ($query_string ? '?' . $query_string : '');
-
-        header("Location: " . $redirect_url, true, 303);
-        exit;
-    }
-
-    if ($_POST['action'] === 'vote_poll' && isset($_POST['poll_id'], $_POST['option_id'], $_POST['post_id'])) {
-        $poll_id = intval($_POST['poll_id']);
-        $option_id = intval($_POST['option_id']);
-        $post_id = intval($_POST['post_id']);
-        $user_id = $_SESSION['user_id'];
-
-        $check = $pdo->prepare("
-            SELECT pv.id FROM poll_votes pv
-            JOIN poll_options po ON pv.option_id = po.id
-            WHERE po.poll_id = ? AND pv.user_id = ?
-        ");
-        $check->execute([$poll_id, $user_id]);
-
-        if (!$check->fetch()) {
-            $stmt = $pdo->prepare("INSERT INTO poll_votes (option_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$option_id, $user_id]);
-        }
-
-        $params = $_GET;
-        $query_string = http_build_query($params);
         $redirect_url = 'index.php' . ($query_string ? '?' . $query_string : '') . '#post-' . $post_id;
 
         header("Location: " . $redirect_url, true, 303);
@@ -463,56 +437,6 @@ if ($filter_sort === 'oldest') {
                                             <?= $icon ?> <?= $ext ?>
                                         </span>
                                     <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-
-                            <?php
-
-                            $poll_detail = getPoll($pdo, $post['id']);
-                            if ($poll_detail):
-                                $user_voted = isLoggedIn() ? hasVoted($pdo, $_SESSION['user_id'], $poll_detail['id']) : true;
-                                $total_votes = array_sum(array_column($poll_detail['options'], 'vote_count'));
-                            ?>
-                                <div style="background: linear-gradient(135deg, var(--light-mint) 0%, #e8f8f5 100%); padding: 1rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid var(--primary-mint);">
-                                    <h4 style="color: var(--primary-mint); margin-bottom: 0.75rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
-                                        <i class='bx bx-bar-chart-alt-2'></i> <?= h($poll_detail['question']) ?>
-                                    </h4>
-
-                                    <?php if (isLoggedIn() && !$user_voted): ?>
-
-                                        <form method="POST">
-                                            <input type="hidden" name="action" value="vote_poll">
-                                            <input type="hidden" name="poll_id" value="<?= $poll_detail['id'] ?>">
-                                            <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                            <?php foreach ($poll_detail['options'] as $option): ?>
-                                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem; margin: 0.4rem 0; background: white; border: 2px solid #e8e8e8; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--primary-mint)'" onmouseout="this.style.borderColor='#e8e8e8'">
-                                                    <input type="radio" name="option_id" value="<?= $option['id'] ?>" required style="width: 18px; height: 18px;">
-                                                    <span style="font-weight: 600; font-size: 0.9rem;"><?= h($option['option_text']) ?></span>
-                                                </label>
-                                            <?php endforeach; ?>
-                                            <button type="submit" style="width: 100%; padding: 0.6rem; margin-top: 0.5rem; background: linear-gradient(135deg, var(--primary-mint), #00a37a); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                                                <i class='bx bx-check-circle'></i> Gửi câu trả lời
-                                            </button>
-                                        </form>
-                                    <?php else: ?>
-
-                                        <?php foreach ($poll_detail['options'] as $option):
-                                            $percentage = $total_votes > 0 ? round(($option['vote_count'] / $total_votes) * 100, 1) : 0;
-                                        ?>
-                                            <div style="margin: 0.5rem 0;">
-                                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.85rem;">
-                                                    <span style="font-weight: 600;"><?= h($option['option_text']) ?></span>
-                                                    <span style="color: #636e72; font-weight: 600;"><?= $percentage ?>%</span>
-                                                </div>
-                                                <div style="background: white; height: 8px; border-radius: 4px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
-                                                    <div style="background: linear-gradient(90deg, var(--primary-mint), #2ecc71); height: 100%; width: <?= $percentage ?>%; transition: width 0.5s ease;"></div>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                        <p style="text-align: right; color: #636e72; font-size: 0.8rem; margin-top: 0.5rem;">
-                                            Tổng: <?= $total_votes ?> phiếu
-                                        </p>
-                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
 

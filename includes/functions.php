@@ -216,40 +216,6 @@ function getAttachments($pdo, $post_id)
     return $stmt->fetchAll();
 }
 
-
-function getPoll($pdo, $post_id)
-{
-    $stmt = $pdo->prepare("SELECT * FROM polls WHERE post_id = ?");
-    $stmt->execute([$post_id]);
-    $poll = $stmt->fetch();
-
-    if ($poll) {
-
-        $stmt = $pdo->prepare("
-            SELECT po.*, COUNT(pv.id) as vote_count
-            FROM poll_options po
-            LEFT JOIN poll_votes pv ON po.id = pv.option_id
-            WHERE po.poll_id = ?
-            GROUP BY po.id
-        ");
-        $stmt->execute([$poll['id']]);
-        $poll['options'] = $stmt->fetchAll();
-    }
-
-    return $poll;
-}
-
-function hasVoted($pdo, $user_id, $poll_id)
-{
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*) FROM poll_votes pv
-        JOIN poll_options po ON pv.option_id = po.id
-        WHERE po.poll_id = ? AND pv.user_id = ?
-    ");
-    $stmt->execute([$poll_id, $user_id]);
-    return $stmt->fetchColumn() > 0;
-}
-
 function getTagStats($pdo)
 {
     $stmt = $pdo->query("

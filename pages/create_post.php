@@ -14,9 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
 
-    $title = trim($_POST['title']);
-    $content = trim($_POST['content']);
-
     if (empty($title)) {
         $error = 'Vui lòng nhập tiêu đề bài viết';
     } elseif (strlen($title) < 5) {

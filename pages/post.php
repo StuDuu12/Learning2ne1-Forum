@@ -177,33 +177,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_status'])) {
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vote_poll'])) {
-    if (!isLoggedIn()) {
-        redirect('login.php');
-    }
-
-    $option_id = (int)$_POST['option_id'];
-
-    $stmt = $pdo->prepare("
-        SELECT pv.id FROM poll_votes pv
-        JOIN poll_options po ON pv.option_id = po.id
-        WHERE pv.user_id = ? AND po.poll_id = (SELECT poll_id FROM poll_options WHERE id = ?)
-    ");
-    $stmt->execute([$_SESSION['user_id'], $option_id]);
-
-    if (!$stmt->fetch()) {
-        $stmt = $pdo->prepare("INSERT INTO poll_votes (option_id, user_id) VALUES (?, ?)");
-        $stmt->execute([$option_id, $_SESSION['user_id']]);
-    }
-    header("Location: post.php?id=$post_id", true, 303);
-    exit;
-}
-
 $post = getPost($pdo, $post_id);
 
 $attachments = getAttachments($pdo, $post_id);
-
-$poll = getPoll($pdo, $post_id);
 
 $comment_sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 
@@ -348,51 +324,6 @@ $total_comments = $stmt->fetchColumn();
                 </div>
             <?php endif; ?>
 
-
-            <?php if ($poll): ?>
-                <div class="poll-section">
-                    <div class="poll-title"><i class='bx bx-poll'></i> <?= h($poll['question']) ?></div>
-                    <?php
-                    $user_voted = isLoggedIn() ? hasVoted($pdo, $_SESSION['user_id'], $poll['id']) : false;
-                    $total_votes = array_sum(array_column($poll['options'], 'vote_count'));
-                    ?>
-
-                    <?php if ($user_voted || !isLoggedIn()): ?>
-                        <?php foreach ($poll['options'] as $option):
-                            $percentage = $total_votes > 0 ? round(($option['vote_count'] / $total_votes) * 100, 1) : 0;
-                        ?>
-                            <div class="poll-result">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="font-weight: 600;"><?= h($option['option_text']) ?></span>
-                                    <span style="color: #636e72;"><?= $option['vote_count'] ?> phiếu (<?= $percentage ?>%)</span>
-                                </div>
-                                <div class="poll-progress">
-                                    <div class="poll-progress-bar" style="width: <?= $percentage ?>%"></div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                        <div style="text-align: center; color: #636e72; margin-top: 1rem; font-size: 0.9rem;">
-                            <i class='bx bx-poll'></i> Tổng: <?= $total_votes ?> phiếu bầu
-                            <?php if (!isLoggedIn()): ?>
-                                <br><a href="login.php" style="color: var(--primary-mint);">Đăng nhập để bỏ phiếu</a>
-                            <?php endif; ?>
-                        </div>
-                    <?php else: ?>
-                        <form method="POST">
-                            <?php foreach ($poll['options'] as $option): ?>
-                                <button type="submit" name="vote_poll" class="poll-option-btn">
-                                    <input type="hidden" name="option_id" value="<?= $option['id'] ?>">
-                                    <i class='bx bx-radio-circle' style="font-size: 1.2rem; color: var(--primary-mint);"></i>
-                                    <span style="font-weight: 600;"><?= h($option['option_text']) ?></span>
-                                </button>
-                            <?php endforeach; ?>
-                        </form>
-                        <p style="text-align: center; color: #636e72; margin-top: 1rem; font-size: 0.85rem;">
-                            Nhấn vào lựa chọn để bỏ phiếu
-                        </p>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
 
             <div class="interaction-bar">
                 <form method="POST" style="display: inline;">
