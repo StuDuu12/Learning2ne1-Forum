@@ -822,7 +822,7 @@ LIMIT 5
 
 ## 👨‍💻 Tác giả
 
-**Chu Quang Duy** - K69 - Learning2ne1 Team
+**Chu Quang Duy** - K73 - Learning2ne1 Team
 
 ---
 
