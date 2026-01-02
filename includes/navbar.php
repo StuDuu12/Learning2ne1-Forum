@@ -32,6 +32,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <a href="<?= $path ?>index.php" class="nav-link <?= $current_page == 'index.php' ? 'active' : '' ?>"><i class='bx  bx-home-alt-3'></i> Trang chủ</a>
             <a href="<?= $path ?>pages/resources.php" class="nav-link <?= $current_page == 'resources.php' ? 'active' : '' ?>"><i class='bx  bx-book-library'></i> Học liệu</a>
+            <a href="<?= $path ?>pages/dashboard.php" class="nav-link <?= $current_page == 'dashboard.php' ? 'active' : '' ?>"><i class='bx  bx-chart-bar-columns'></i> Xu hướng</a>
 
             <?php
             $accountLevel = $_SESSION['account_level'] ?? $_SESSION['role'] ?? null;
@@ -40,13 +41,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <?php } ?>
 
             <?php if (isset($current_user['id_user'])) { ?>
-                <a href="<?= $path ?>pages/dashboard.php" class="nav-link <?= $current_page == 'dashboard.php' ? 'active' : '' ?>"><i class='bx  bx-chart-bar-columns'></i> Xu hướng</a>
-
-
                 <div class="user-section">
-
-
-
                     <div class="user-menu" style="display: flex; align-items: center; gap: 5px;">
                         <a href="<?= $path ?>pages/profile.php?username=<?= urlencode($current_user['username']) ?>" class="user-profile-link">
                             <div class="user-avatar-small">

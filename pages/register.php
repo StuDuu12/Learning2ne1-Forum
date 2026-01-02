@@ -6,10 +6,12 @@ require_once '../includes/functions.php';
 $errors = $_SESSION['errors_register'] ?? [];
 $success_message = '';
 $username = $_SESSION['register_username'] ?? '';
-unset($_SESSION['errors_register'], $_SESSION['register_username']);
+$ho_ten = $_SESSION['register_ho_ten'] ?? '';
+unset($_SESSION['errors_register'], $_SESSION['register_username'], $_SESSION['register_ho_ten']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
+    $ho_ten = trim($_POST['ho_ten'] ?? '');
     $password = trim($_POST['password'] ?? '');
     $confirm_password = trim($_POST['confirm_password'] ?? '');
 
@@ -19,10 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['username'] = 'Username phải có ít nhất 3 ký tự.';
     }
 
+    if ($ho_ten === '') {
+        $errors['ho_ten'] = 'Vui lòng nhập họ tên.';
+    }
+
     if ($password === '') {
         $errors['password'] = 'Vui lòng nhập mật khẩu.';
-    } elseif (strlen($password) < 6) {
-        $errors['password'] = 'Mật khẩu phải có ít nhất 6 ký tự.';
+    } elseif (strlen($password) < 3) {
+        $errors['password'] = 'Mật khẩu phải có ít nhất 3 ký tự.';
     }
 
     if ($confirm_password === '') {
@@ -39,9 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors['username'] = 'Username đã tồn tại!';
         } else {
             $insert_stmt = $pdo->prepare("INSERT INTO user (ho_ten, username, password, account_level) VALUES (?, ?, ?, 2)");
-            if ($insert_stmt->execute([$username, $username, $password])) {
+            if ($insert_stmt->execute([$ho_ten, $username, $password])) {
                 $success_message = "Đăng ký thành công! Đang chuyển hướng...";
                 $username = '';
+                $ho_ten = '';
                 header("refresh:2;url=login.php");
             } else {
                 $errors['general'] = 'Có lỏi xảy ra, vui lòng thử lại!';
@@ -52,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($errors)) {
         $_SESSION['errors_register'] = $errors;
         $_SESSION['register_username'] = $username;
+        $_SESSION['register_ho_ten'] = $ho_ten;
         header("Location: register.php");
         exit;
     }
@@ -75,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-wrapper">
         <div class="login-container">
             <div class="login-header">
-                <h2>Đăng ký tài khoản</h2>
+                <h2>Đăng ký</h2>
                 <p style="font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #00b894 0%, #00cec9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0.5rem 0 0 0; letter-spacing: 1px;">Learning2ne1 Forum</p>
             </div>
 
@@ -102,8 +110,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-group">
+                    <label for="ho_ten">Họ tên</label>
+                    <input type="text" id="ho_ten" name="ho_ten" placeholder="Nhập họ tên của bạn" value="<?php echo htmlspecialchars($ho_ten); ?>">
+                    <?php if (!empty($errors['ho_ten'])) { ?>
+                        <p class="field-error"><?php echo $errors['ho_ten']; ?></p>
+                    <?php } ?>
+                </div>
+
+                <div class="form-group">
                     <label for="password">Mật khẩu</label>
-                    <input type="password" id="password" name="password" placeholder="Ít nhất 6 ký tự" value="">
+                    <input type="password" id="password" name="password" placeholder="Ít nhất 3 ký tự" value="">
                     <?php if (!empty($errors['password'])) { ?>
                         <p class="field-error"><?php echo $errors['password']; ?></p>
                     <?php } ?>

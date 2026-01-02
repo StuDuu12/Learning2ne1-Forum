@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($new_fullname === '') {
         $errors['ho_ten'] = 'Vui lòng nhập họ tên.';
     }
-    if (trim($new_password) === '' || strlen($new_password) < 6) {
-        $errors['password'] = 'Mật khẩu phải có ít nhất 6 ký tự.';
+    if (trim($new_password) === '' || strlen($new_password) < 3) {
+        $errors['password'] = 'Mật khẩu phải có ít nhất 3 ký tự.';
     }
     if (!in_array($new_account_level, [0, 1, 2], true)) {
         $errors['account_level'] = 'Vai trò không hợp lệ.';
@@ -160,7 +160,7 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
 
                         <div class="form-group">
                             <label for="password"><i class='bx bx-lock'></i> Mật khẩu</label>
-                            <input type="password" name="password" id="password" class="form-control" placeholder="Ít nhất 6 ký tự">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Ít nhất 3 ký tự">
                             <?php if (!empty($errors['password'])) { ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['password']; ?></p><?php } ?>
                         </div>
 
@@ -278,7 +278,7 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
                                                         <i class='bx bx-trash'></i> Xóa
                                                     </a>
                                                 <?php } else { ?>
-                                                    <em style="color: #95a5a6;">Không thể sửa/xóa</em>
+                                                    <em style="color: #95a5a6;">--</em>
                                                 <?php } ?>
                                             </div>
                                         </td>

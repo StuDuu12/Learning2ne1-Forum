@@ -174,8 +174,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_status'])) {
     exit;
 }
 
-$post = getPost($pdo, $post_id);
-
 $attachments = getAttachments($pdo, $post_id);
 
 $comment_sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
@@ -445,7 +443,7 @@ $total_comments = $stmt->fetchColumn();
                             <div id="reply-form-<?= $comment['id'] ?>" style="display: none;">
                                 <form method="POST">
                                     <input type="hidden" name="parent_id" value="<?= $comment['id'] ?>">
-                                    <textarea name="comment_content" placeholder="💭 Viết câu trả lời cho <?= h($comment['ho_ten']) ?>..." required style="width: 100%; padding: 0.85rem 1rem; border-radius: 10px; border: 2px solid rgba(253, 203, 110, 0.4); font-family: inherit; min-height: 80px;"></textarea>
+                                    <textarea name="comment_content" placeholder="Viết câu trả lời cho <?= h($comment['ho_ten']) ?>..." required style="width: 100%; padding: 0.85rem 1rem; border-radius: 10px; border: 2px solid rgba(253, 203, 110, 0.4); font-family: inherit; min-height: 80px;"></textarea>
                                     <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
                                         <button type="submit" name="add_comment" class="btn-submit"><i class='bx bx-send'></i> Gửi trả lời</button>
                                         <button type="button" onclick="toggleReplyForm(<?= $comment['id'] ?>)" style="padding: 0.75rem 1.5rem; background: #dfe6e9; color: #2d3436; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Hủy</button>
@@ -511,7 +509,7 @@ $total_comments = $stmt->fetchColumn();
                                             <div id="reply-form-<?= $reply['id'] ?>" style="display: none;">
                                                 <form method="POST">
                                                     <input type="hidden" name="parent_id" value="<?= $comment['id'] ?>">
-                                                    <textarea name="comment_content" placeholder="💭 Trả lời @<?= h($reply['username']) ?>..." required style="width: 100%; padding: 0.85rem 1rem; border-radius: 10px; border: 2px solid rgba(253, 203, 110, 0.4); font-family: inherit; min-height: 80px;"></textarea>
+                                                    <textarea name="comment_content" placeholder="Trả lời @<?= h($reply['username']) ?>..." required style="width: 100%; padding: 0.85rem 1rem; border-radius: 10px; border: 2px solid rgba(253, 203, 110, 0.4); font-family: inherit; min-height: 80px;"></textarea>
                                                     <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
                                                         <button type="submit" name="add_comment" class="btn-submit"><i class='bx bx-send'></i> Gửi</button>
                                                         <button type="button" onclick="toggleReplyForm(<?= $reply['id'] ?>)" style="padding: 0.75rem 1.5rem; background: #dfe6e9; color: #2d3436; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Hủy</button>
@@ -544,43 +542,34 @@ $total_comments = $stmt->fetchColumn();
     </div>
 
     <script>
-        function toggleReplyForm(commentId) {
-            var form = document.getElementById('reply-form-' + commentId);
-            if (form) {
-                document.querySelectorAll('[id^="reply-form-"]').forEach(function(f) {
-                    if (f.id !== 'reply-form-' + commentId) {
-                        f.style.display = 'none';
-                    }
+        function toggleForm(formType, commentId) {
+            const form = document.getElementById(formType + '-' + commentId);
+            if (!form) return;
+            document.querySelectorAll('[id^="' + formType + '-"]').forEach(f => {
+                if (f !== form) f.style.display = 'none';
+            });
+
+            if (formType === 'edit-form') {
+                document.querySelectorAll('[id^="content-"]').forEach(c => {
+                    c.style.display = 'block';
                 });
-                form.style.display = form.style.display === 'none' ? 'block' : 'none';
-                if (form.style.display === 'block') {
-                    form.querySelector('textarea').focus();
-                }
+                const content = document.getElementById('content-' + commentId);
+                if (content) content.style.display = form.style.display === 'none' ? 'none' : 'block';
+            }
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+
+            if (form.style.display === 'block') {
+                const textarea = form.querySelector('textarea');
+                if (textarea) textarea.focus();
             }
         }
 
-        function toggleEditForm(commentId) {
-            var form = document.getElementById('edit-form-' + commentId);
-            var content = document.getElementById('content-' + commentId);
-            if (form && content) {
-                document.querySelectorAll('[id^="edit-form-"]').forEach(function(f) {
-                    if (f.id !== 'edit-form-' + commentId) {
-                        f.style.display = 'none';
-                    }
-                });
-                document.querySelectorAll('[id^="content-"]').forEach(function(c) {
-                    c.style.display = 'block';
-                });
+        function toggleReplyForm(commentId) {
+            toggleForm('reply-form', commentId);
+        }
 
-                if (form.style.display === 'none') {
-                    form.style.display = 'block';
-                    content.style.display = 'none';
-                    form.querySelector('textarea').focus();
-                } else {
-                    form.style.display = 'none';
-                    content.style.display = 'block';
-                }
-            }
+        function toggleEditForm(commentId) {
+            toggleForm('edit-form', commentId);
         }
     </script>
 </body>

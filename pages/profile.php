@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-$stmt = $pdo->prepare("
+$stmt = $pdo->prepare(" 
     SELECT p.*, 
            (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
            (SELECT COUNT(*) FROM likes WHERE target_id = p.id AND target_type = 'post') as like_count

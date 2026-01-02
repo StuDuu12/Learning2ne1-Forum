@@ -2,11 +2,7 @@
 require_once '../config.php';
 require_once '../includes/functions.php';
 
-if (!isLoggedIn()) {
-    redirect('login.php');
-}
-
-$current_user = getCurrentUser($pdo);
+$current_user = isLoggedIn() ? getCurrentUser($pdo) : null;
 $accountLevel = $current_user['account_level'] ?? ($_SESSION['role'] ?? null);
 if (!isset($_SESSION['account_level']) && $accountLevel !== null) {
     $_SESSION['account_level'] = $accountLevel;
@@ -14,7 +10,7 @@ if (!isset($_SESSION['account_level']) && $accountLevel !== null) {
 
 $community_stats = getTagStats($pdo);
 
-$user_stats = getUserInterests($pdo, $_SESSION['user_id']);
+$user_stats = isLoggedIn() ? getUserInterests($pdo, $_SESSION['user_id']) : [];
 
 $total_users = 0;
 $total_posts = 0;
@@ -36,17 +32,20 @@ if ($isAdmin) {
     $total_likes = $stmt->fetchColumn();
 }
 
-$stmt = $pdo->prepare("
-    SELECT p.*, 
-           (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
-           (SELECT COUNT(*) FROM likes WHERE target_id = p.id AND target_type = 'post') as like_count
-    FROM posts p
-    WHERE p.user_id = ?
-    ORDER BY p.created_at DESC
-    LIMIT 10
-");
-$stmt->execute([$_SESSION['user_id']]);
-$user_posts = $stmt->fetchAll();
+$user_posts = [];
+if (isLoggedIn()) {
+    $stmt = $pdo->prepare("
+        SELECT p.*, 
+               (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
+               (SELECT COUNT(*) FROM likes WHERE target_id = p.id AND target_type = 'post') as like_count
+        FROM posts p
+        WHERE p.user_id = ?
+        ORDER BY p.created_at DESC
+        LIMIT 10
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user_posts = $stmt->fetchAll();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -100,9 +99,13 @@ $user_posts = $stmt->fetchAll();
             <div class="stat-card">
                 <div class="stat-icon"><i class='bx bx-message'></i></div>
                 <?php
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM comments WHERE user_id = ?");
-                $stmt->execute([$_SESSION['user_id']]);
-                $my_comments = $stmt->fetchColumn();
+                if (isLoggedIn()) {
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM comments WHERE user_id = ?");
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $my_comments = $stmt->fetchColumn();
+                } else {
+                    $my_comments = 0;
+                }
                 ?>
                 <div class="stat-value"><?= $my_comments ?></div>
                 <div class="stat-label">Bình luận của tôi</div>
@@ -110,9 +113,13 @@ $user_posts = $stmt->fetchAll();
             <div class="stat-card">
                 <div class="stat-icon"><i class='bx bx-like'></i></div>
                 <?php
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE user_id = ?");
-                $stmt->execute([$_SESSION['user_id']]);
-                $my_likes = $stmt->fetchColumn();
+                if (isLoggedIn()) {
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE user_id = ?");
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $my_likes = $stmt->fetchColumn();
+                } else {
+                    $my_likes = 0;
+                }
                 ?>
                 <div class="stat-value"><?= $my_likes ?></div>
                 <div class="stat-label">Đã thích</div>
@@ -120,13 +127,17 @@ $user_posts = $stmt->fetchAll();
             <div class="stat-card">
                 <div class="stat-icon"><i class='bx  bx-medal-star-alt-2'></i></div>
                 <?php
-                $stmt = $pdo->prepare("
-                    SELECT COUNT(*) FROM likes l
-                    JOIN posts p ON l.target_id = p.id
-                    WHERE l.target_type = 'post' AND p.user_id = ?
-                ");
-                $stmt->execute([$_SESSION['user_id']]);
-                $received_likes = $stmt->fetchColumn();
+                if (isLoggedIn()) {
+                    $stmt = $pdo->prepare("
+                        SELECT COUNT(*) FROM likes l
+                        JOIN posts p ON l.target_id = p.id
+                        WHERE l.target_type = 'post' AND p.user_id = ?
+                    ");
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $received_likes = $stmt->fetchColumn();
+                } else {
+                    $received_likes = 0;
+                }
                 ?>
                 <div class="stat-value"><?= $received_likes ?></div>
                 <div class="stat-label">Nhận được lượt thích</div>

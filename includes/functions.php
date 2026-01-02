@@ -212,7 +212,7 @@ function handleUpload($file)
         return [
             'success' => true,
             'path' => 'uploads/' . $filename,
-            'type' => $file['type']
+            'type' => substr($file['type'], 0, 50)
         ];
     }
 

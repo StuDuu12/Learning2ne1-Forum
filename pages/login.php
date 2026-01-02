@@ -93,7 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="login-footer">
                 <p>Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a></p>
-                <p><a href="#">Quên mật khẩu?</a></p>
                 <p><a href="../index.php" class="btn-guest" title="Tiếp tục truy cập với tư cách khách">Tiếp tục với khách</a></p>
             </div>
         </div>
