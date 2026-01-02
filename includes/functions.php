@@ -23,14 +23,6 @@ function getCurrentUser($pdo)
     return $stmt->fetch();
 }
 
-function checkRole($required_level)
-{
-    if (!isLoggedIn()) {
-        return false;
-    }
-    return $_SESSION['account_level'] <= $required_level;
-}
-
 function redirect($url)
 {
     header("Location: $url");
@@ -77,55 +69,6 @@ function getTrending($pdo, $limit = 5)
         GROUP BY p.id
         HAVING (like_count >= 5 AND comment_count >= 5)
         ORDER BY engagement_score DESC, p.created_at DESC
-        LIMIT ?
-    ");
-    $stmt->execute([$limit]);
-    return $stmt->fetchAll();
-}
-
-function getSuggested($pdo, $user_id = null, $limit = 10)
-{
-    if ($user_id) {
-
-        $stmt = $pdo->prepare("
-            SELECT tag FROM user_interests 
-            WHERE user_id = ? 
-            ORDER BY score DESC 
-            LIMIT 1
-        ");
-        $stmt->execute([$user_id]);
-        $top_interest = $stmt->fetchColumn();
-
-        if ($top_interest) {
-
-            $stmt = $pdo->prepare("
-                SELECT p.*, u.ho_ten, u.username,
-                       COUNT(DISTINCT c.id) as comment_count
-                FROM posts p
-                JOIN user u ON p.user_id = u.id_user
-                LEFT JOIN comments c ON c.post_id = p.id
-                WHERE p.privacy = 'public' 
-                      AND (p.tags LIKE ? OR p.tags LIKE ? OR p.tags LIKE ?)
-                GROUP BY p.id
-                ORDER BY p.created_at DESC
-                LIMIT ?
-            ");
-            $like_pattern = "%$top_interest%";
-            $stmt->execute([$like_pattern, $like_pattern, $like_pattern, $limit]);
-            return $stmt->fetchAll();
-        }
-    }
-
-
-    $stmt = $pdo->prepare("
-        SELECT p.*, u.ho_ten, u.username,
-               COUNT(DISTINCT c.id) as comment_count
-        FROM posts p
-        JOIN user u ON p.user_id = u.id_user
-        LEFT JOIN comments c ON c.post_id = p.id
-        WHERE p.privacy = 'public'
-        GROUP BY p.id
-        ORDER BY p.created_at DESC
         LIMIT ?
     ");
     $stmt->execute([$limit]);
@@ -274,4 +217,26 @@ function handleUpload($file)
     }
 
     return ['success' => false, 'error' => 'Failed to save file'];
+}
+
+function parseResourceMeta($mo_ta)
+{
+    $category = '';
+    $topic = '';
+    $description = $mo_ta;
+
+    if (preg_match('/\[CATEGORY:([^\]]+)\]/', $mo_ta, $matches)) {
+        $category = $matches[1];
+        $description = str_replace($matches[0], '', $description);
+    }
+    if (preg_match('/\[TOPIC:([^\]]+)\]/', $mo_ta, $matches)) {
+        $topic = $matches[1];
+        $description = str_replace($matches[0], '', $description);
+    }
+
+    return [
+        'category' => $category,
+        'topic' => $topic,
+        'description' => trim($description)
+    ];
 }

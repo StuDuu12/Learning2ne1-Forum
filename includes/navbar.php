@@ -15,7 +15,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
 <link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
-<link rel="stylesheet" href="<?= $path ?>assets/css/navbar.css?v=<?php echo time(); ?>">
 
 <nav class="navbar">
     <div class="navbar-container">
@@ -36,11 +35,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <?php
             $accountLevel = $_SESSION['account_level'] ?? $_SESSION['role'] ?? null;
-            if (isset($_SESSION['user_id']) && $accountLevel === 0): ?>
+            if (isset($_SESSION['user_id']) && $accountLevel === 0) { ?>
                 <a href="<?= $path ?>pages/admin_users.php" class="nav-link <?= $current_page == 'admin_users.php' ? 'active' : '' ?>"><i class='bx  bx-community'></i> Quản lý thành viên</a>
-            <?php endif; ?>
+            <?php } ?>
 
-            <?php if (isset($current_user['id_user'])): ?>
+            <?php if (isset($current_user['id_user'])) { ?>
                 <a href="<?= $path ?>pages/dashboard.php" class="nav-link <?= $current_page == 'dashboard.php' ? 'active' : '' ?>"><i class='bx  bx-chart-bar-columns'></i> Xu hướng</a>
 
 
@@ -59,9 +58,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </div>
                 </div>
 
-            <?php else: ?>
+            <?php } else { ?>
                 <a href="<?= $path ?>pages/login.php" class="nav-link" style="background: white; color: #00796b;"><i class='bx  bx-arrow-in-left-stroke-circle-half'></i> Đăng nhập</a>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 </nav>
@@ -71,9 +70,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
         hamburger.classList.toggle('active');
         document.getElementById('navbarMenu').classList.toggle('active');
     }
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            document.getElementById('navbarMenu').classList.remove('active');
-        }
-    });
 </script>
+
+<style>
+    @media (min-width: 769px) {
+        .hamburger {
+            display: none !important;
+        }
+
+        #navbarMenu {
+            display: flex !important;
+        }
+
+        #navbarMenu.active {
+            display: flex;
+        }
+    }
+</style>

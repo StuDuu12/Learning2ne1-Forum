@@ -127,8 +127,8 @@ if ($filter_sort === 'oldest') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning2ne1 - Trang chủ diễn đàn</title>
-    <link rel="stylesheet" href="assets/css/base.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="assets/css/index.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/index.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -137,20 +137,20 @@ if ($filter_sort === 'oldest') {
     <?php include 'includes/navbar.php'; ?>
 
     <div class="container">
-        <?php if (!isLoggedIn()): ?>
+        <?php if (!isLoggedIn()) { ?>
             <div class="guest-notice">
                 <strong><i class='bx bx-waving-hand'></i> Chào mừng!</strong> Bạn đang ở chế độ khách.
                 <a href="pages/login.php" style="color: var(--primary-mint); font-weight: bold;">Đăng nhập</a>
                 để tương tác và tạo bài viết.
             </div>
-        <?php else: ?>
+        <?php } else { ?>
             <div class="hero" style="text-align: center; margin-bottom: 2rem;">
                 <h1 style="font-family: 'Poppins', sans-serif; font-size: 3.2rem; font-weight: 900; color: white; letter-spacing: 2px; margin: 0; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); background: linear-gradient(135deg, #ffffff 0%, #e8f8f5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
                     Learning2ne1 <span style="color: #00b894; font-weight: 800; letter-spacing: 5px;"> FORUM</span>
                 </h1>
                 <h3 style="color: rgba(255, 255, 255, 0.95); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.3rem; font-weight: 600; margin-top: 1rem; letter-spacing: 0.5px;"><i class='bx bx-wink-smile'></i> Xin chào, <?= h($current_user['username']) ?>!</h3>
             </div>
-        <?php endif; ?>
+        <?php } ?>
 
 
         <div class="search-filter-section">
@@ -161,19 +161,19 @@ if ($filter_sort === 'oldest') {
                 <input type="hidden" name="sort" value="<?= h($filter_sort) ?>">
                 <input type="hidden" name="time" value="<?= h($filter_time) ?>">
                 <i class="bx bx-search search-icon"></i>
-                <input type="text" name="search" placeholder="Tìm kiếm bài viết theo tiêu đề, nội dung, tag..."
+                <input type="text" name="search" placeholder="Tìm kiếm bài viết theo tiêu đề, nội dung, tag"
                     value="<?= h($search_query) ?>" class="search-input">
                 <button type="submit" class="search-btn">
                     <i class='bx bx-search'></i> Tìm
                 </button>
             </form>
 
-            <?php if ($search_query !== ''): ?>
+            <?php if ($search_query !== '') { ?>
                 <div class="search-result-info">
                     <span>Kết quả tìm kiếm cho: <strong>"<?= h($search_query) ?>"</strong></span>
                     <a href="index.php?tab=<?= h($current_tab) ?>&status=<?= h($filter_status) ?>&sort=<?= h($filter_sort) ?>&time=<?= h($filter_time) ?>">✕ Xóa tìm kiếm</a>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
 
             <div class="filter-bar">
@@ -210,23 +210,23 @@ if ($filter_sort === 'oldest') {
                     </select>
                 </form>
 
-                <?php if ($filter_status !== '' || $filter_time !== '' || $filter_sort !== ''): ?>
+                <?php if ($filter_status !== '' || $filter_time !== '' || $filter_sort !== '') { ?>
                     <a href="index.php?tab=<?= h($current_tab) ?>&search=<?= urlencode($search_query) ?>" class="filter-clear">
                         <i class='bx bx-x'></i> Xóa bộ lọc
                     </a>
-                <?php endif; ?>
+                <?php } ?>
             </div>
 
 
-            <?php if ($filter_status !== '' || $filter_time !== '' || $filter_sort !== ''): ?>
+            <?php if ($filter_status !== '' || $filter_time !== '' || $filter_sort !== '') { ?>
                 <div class="active-filters">
-                    <?php if ($filter_status !== ''): ?>
+                    <?php if ($filter_status !== '') { ?>
                         <span class="filter-tag">
                             <i class='bx bx-check-circle'></i>
                             <?= $filter_status === 'solved' ? 'Đã giải quyết' : 'Chưa giải quyết' ?>
                         </span>
-                    <?php endif; ?>
-                    <?php if ($filter_time !== ''): ?>
+                    <?php } ?>
+                    <?php if ($filter_time !== '') { ?>
                         <span class="filter-tag">
                             <i class='bx bx-time'></i>
                             <?php
@@ -243,8 +243,8 @@ if ($filter_sort === 'oldest') {
                             }
                             ?>
                         </span>
-                    <?php endif; ?>
-                    <?php if ($filter_sort !== ''): ?>
+                    <?php } ?>
+                    <?php if ($filter_sort !== '') { ?>
                         <span class="filter-tag">
                             <i class='bx bx-sort-alt-2'></i>
                             <?php
@@ -264,12 +264,12 @@ if ($filter_sort === 'oldest') {
                             }
                             ?>
                         </span>
-                    <?php endif; ?>
+                    <?php } ?>
                     <span class="filter-result-count">
                         <i class='bx bx-list-ul'></i> <?= count($all_posts) ?> bài viết
                     </span>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
 
             <div class="tabs-container">
@@ -284,18 +284,18 @@ if ($filter_sort === 'oldest') {
             </div>
         </div>
 
-        <?php if ($current_tab === 'all'): ?>
+        <?php if ($current_tab === 'all') { ?>
 
             <h2 class="section-title"><i class='bx bx-globe'></i> Tất cả bài viết</h2>
 
-            <?php if (empty($all_posts)): ?>
+            <?php if (empty($all_posts)) { ?>
                 <div style="text-align: center; padding: 3rem; color: #636e72; background: white; border-radius: 15px;">
                     <div style="font-size: 3rem;"><i class='bx bx-search'></i></div>
                     <p>Không tìm thấy bài viết nào.</p>
                 </div>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="posts-grid" id="posts-section">
-                    <?php foreach ($all_posts as $post):
+                    <?php foreach ($all_posts as $post) {
                         $user_liked = isLoggedIn() ? hasLiked($pdo, $_SESSION['user_id'], $post['id'], 'post') : false;
                         $likes = getLikeCount($pdo, $post['id'], 'post');
 
@@ -320,18 +320,18 @@ if ($filter_sort === 'oldest') {
                                 </a>
                                 <div class="post-status-container">
                                     <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                                        <?php if ($is_trending): ?>
+                                        <?php if ($is_trending) { ?>
                                             <span class="trending-badge"><i class='bx bx-trending-up'></i> Trending</span>
-                                        <?php endif; ?>
-                                        <?php if ($post['privacy'] === 'private'): ?>
+                                        <?php } ?>
+                                        <?php if ($post['privacy'] === 'private') { ?>
                                             <span class="post-privacy privacy-private">
                                                 <i class='bx bx-lock-alt'></i> Riêng tư
                                             </span>
-                                        <?php else: ?>
+                                        <?php } else { ?>
                                             <span class="post-privacy privacy-public">
                                                 <i class='bx bx-globe'></i> Công khai
                                             </span>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </div>
                                     <span class="post-status status-<?= $post['status'] ?>">
                                         <?= $post['status'] === 'solved' ? '✓ Đã giải quyết' : '❓ Chưa giải quyết' ?>
@@ -344,13 +344,13 @@ if ($filter_sort === 'oldest') {
                                 <h3 class="post-title"><?= h($post['title']) ?></h3>
                                 <p class="post-excerpt"><?= h(mb_substr(strip_tags($post['content']), 0, 150)) ?>...</p>
 
-                                <?php if (!empty($post['tags'])): ?>
+                                <?php if (!empty($post['tags'])) { ?>
                                     <div class="post-tags">
-                                        <?php foreach (explode(',', $post['tags']) as $tag): ?>
+                                        <?php foreach (explode(',', $post['tags']) as $tag) { ?>
                                             <span class="tag"><?= h(trim($tag)) ?></span>
-                                        <?php endforeach; ?>
+                                        <?php } ?>
                                     </div>
-                                <?php endif; ?>
+                                <?php } ?>
                             </a>
 
                             <?php
@@ -367,24 +367,24 @@ if ($filter_sort === 'oldest') {
                             }
                             ?>
 
-                            <?php if (!empty($images)): ?>
+                            <?php if (!empty($images)) { ?>
                                 <div class="post-preview-images" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0;">
-                                    <?php foreach (array_slice($images, 0, 4) as $img): ?>
+                                    <?php foreach (array_slice($images, 0, 4) as $img) { ?>
                                         <div style="border-radius: 8px; overflow: hidden; background: #f5f6fa; max-width: 200px; max-height: 150px;">
                                             <img src="<?= h($img['file_path']) ?>" alt="Ảnh" style="width: 100%; height: 100%; object-fit: contain; max-height: 200px;">
                                         </div>
-                                    <?php endforeach; ?>
-                                    <?php if (count($images) > 4): ?>
+                                    <?php } ?>
+                                    <?php if (count($images) > 4) { ?>
                                         <div style="border-radius: 8px; background: linear-gradient(135deg, var(--primary-mint), #00a37a); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; width: 60px; height: 60px;">
                                             +<?= count($images) - 4 ?>
                                         </div>
-                                    <?php endif; ?>
+                                    <?php } ?>
                                 </div>
-                            <?php endif; ?>
+                            <?php } ?>
 
-                            <?php if (!empty($files)): ?>
+                            <?php if (!empty($files)) { ?>
                                 <div class="post-preview-files" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0;">
-                                    <?php foreach ($files as $file):
+                                    <?php foreach ($files as $file) {
                                         $ext = strtoupper(pathinfo($file['file_path'], PATHINFO_EXTENSION));
                                         $icon = '📄';
                                         if (in_array($ext, ['PDF'])) $icon = '📕';
@@ -396,9 +396,9 @@ if ($filter_sort === 'oldest') {
                                         <span style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.75rem; background: #f5f6fa; border-radius: 6px; font-size: 0.8rem; color: #636e72;">
                                             <?= $icon ?> <?= $ext ?>
                                         </span>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </div>
-                            <?php endif; ?>
+                            <?php } ?>
 
                             <div class="post-footer">
 
@@ -414,22 +414,22 @@ if ($filter_sort === 'oldest') {
                                 </a>
                             </div>
                         </div>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
-        <?php else: ?>
+        <?php } else { ?>
 
             <h2 class="section-title"><i class='bx bx-trending-up'></i> Bài viết xu hướng (7 ngày qua)</h2>
 
-            <?php if (empty($trending_posts)): ?>
+            <?php if (empty($trending_posts)) { ?>
                 <div style="text-align: center; padding: 3rem; color: #636e72; background: white; border-radius: 15px;">
                     <div style="font-size: 3rem;"><i class='bx  bx-chart-trend'></i></div>
                     <p>Không có bài viết trending trong 7 ngày qua.</p>
                 </div>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="posts-grid">
-                    <?php foreach ($trending_posts as $post):
+                    <?php foreach ($trending_posts as $post) {
                         $user_liked = isLoggedIn() ? hasLiked($pdo, $_SESSION['user_id'], $post['id'], 'post') : false;
                     ?>
                         <div class="post-card" id="post-<?= $post['id'] ?>">
@@ -446,15 +446,15 @@ if ($filter_sort === 'oldest') {
                                 <div class="post-status-container">
                                     <div style="display: flex; gap: 0.5rem; align-items: center;">
                                         <span class="trending-badge"><i class='bx bx-trending-up'></i> Trending</span>
-                                        <?php if ($post['privacy'] === 'private'): ?>
+                                        <?php if ($post['privacy'] === 'private') { ?>
                                             <span class="post-privacy privacy-private">
                                                 <i class='bx bx-lock-alt'></i> Riêng tư
                                             </span>
-                                        <?php else: ?>
+                                        <?php } else { ?>
                                             <span class="post-privacy privacy-public">
                                                 <i class='bx bx-globe'></i> Công khai
                                             </span>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </div>
                                     <span class="post-status status-<?= $post['status'] ?>">
                                         <?= $post['status'] === 'solved' ? '✓ Đã giải quyết' : '❓ Chưa giải quyết' ?>
@@ -466,13 +466,13 @@ if ($filter_sort === 'oldest') {
                                 <h3 class="post-title"><?= h($post['title']) ?></h3>
                                 <p class="post-excerpt"><?= h(mb_substr(strip_tags($post['content']), 0, 150)) ?>...</p>
 
-                                <?php if (!empty($post['tags'])): ?>
+                                <?php if (!empty($post['tags'])) { ?>
                                     <div class="post-tags">
-                                        <?php foreach (explode(',', $post['tags']) as $tag): ?>
+                                        <?php foreach (explode(',', $post['tags']) as $tag) { ?>
                                             <span class="tag"><?= h(trim($tag)) ?></span>
-                                        <?php endforeach; ?>
+                                        <?php } ?>
                                     </div>
-                                <?php endif; ?>
+                                <?php } ?>
                             </a>
 
                             <?php
@@ -489,24 +489,24 @@ if ($filter_sort === 'oldest') {
                             }
                             ?>
 
-                            <?php if (!empty($images)): ?>
+                            <?php if (!empty($images)) { ?>
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0;">
-                                    <?php foreach (array_slice($images, 0, 4) as $img): ?>
+                                    <?php foreach (array_slice($images, 0, 4) as $img) { ?>
                                         <div style="border-radius: 8px; overflow: hidden; background: #f5f6fa; max-width: 150px; max-height: 120px;">
                                             <img src="<?= h($img['file_path']) ?>" alt="Ảnh" style="width: 100%; height: 100%; object-fit: contain; max-height: 120px;">
                                         </div>
-                                    <?php endforeach; ?>
-                                    <?php if (count($images) > 4): ?>
+                                    <?php } ?>
+                                    <?php if (count($images) > 4) { ?>
                                         <div style="border-radius: 8px; background: linear-gradient(135deg, var(--primary-mint), #00a37a); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; width: 50px; height: 50px; font-size: 0.9rem;">
                                             +<?= count($images) - 4 ?>
                                         </div>
-                                    <?php endif; ?>
+                                    <?php } ?>
                                 </div>
-                            <?php endif; ?>
+                            <?php } ?>
 
-                            <?php if (!empty($files)): ?>
+                            <?php if (!empty($files)) { ?>
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0;">
-                                    <?php foreach ($files as $file):
+                                    <?php foreach ($files as $file) {
                                         $ext = strtoupper(pathinfo($file['file_path'], PATHINFO_EXTENSION));
                                         $icon = '📄';
                                         if (in_array($ext, ['PDF'])) $icon = '📕';
@@ -516,9 +516,9 @@ if ($filter_sort === 'oldest') {
                                         <span style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem; background: #f5f6fa; border-radius: 6px; font-size: 0.75rem; color: #636e72;">
                                             <?= $icon ?> <?= $ext ?>
                                         </span>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </div>
-                            <?php endif; ?>
+                            <?php } ?>
 
                             <div class="post-footer">
                                 <form method="POST" style="display: inline;">
@@ -533,21 +533,21 @@ if ($filter_sort === 'oldest') {
                                 </a>
                             </div>
                         </div>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
-        <?php endif; ?>
+            <?php } ?>
+        <?php } ?>
     </div>
 
-    <?php if (isLoggedIn()): ?>
+    <?php if (isLoggedIn()) { ?>
         <a href="pages/create_post.php" class="btn-create" title="Tạo bài viết mới">
             <span class="btn-create-icon"><i class='bx bx-edit'></i></span>
         </a>
-    <?php endif; ?>
+    <?php } ?>
 
     <footer style="text-align: center; padding: 2rem; margin-top: 3rem; background: var(--bg-grey); border-radius: 15px;">
         <p style="color: #636e72; margin: 0;">
-            <strong>Learning2ne1 - Diễn đàn sinh viên</strong><br>
+            <strong>Learning2ne1 Forum</strong><br>
             Được tạo bởi <strong>Chu Quang Duy</strong>
         </p>
     </footer>

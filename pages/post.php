@@ -3,6 +3,7 @@ require_once '../config.php';
 require_once '../includes/functions.php';
 
 $post_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$return_to = isset($_GET['return_to']) ? trim($_GET['return_to']) : '';
 $current_user = getCurrentUser($pdo);
 
 $post = getPost($pdo, $post_id);
@@ -141,9 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_post'])) {
         if (!empty($tags_input)) {
             $tags_array = preg_split('/[,\s]+/', $tags_input);
             $tags_array = array_filter(array_map('trim', $tags_array));
-            $tags_array = array_map(function ($tag) {
-                return (strpos($tag, '#') !== 0) ? '#' . $tag : $tag;
-            }, $tags_array);
             $tags = implode(',', $tags_array);
         } else {
             $tags = '';
@@ -219,7 +217,7 @@ $total_comments = $stmt->fetchColumn();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= h($post['title']) ?> - Diễn đàn sinh viên</title>
-    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/post.css">
     <link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
 
@@ -229,7 +227,13 @@ $total_comments = $stmt->fetchColumn();
     <?php include '../includes/navbar.php'; ?>
 
     <div class="container">
-        <a href="../index.php#post-<?= $post_id ?>" class="btn-back">← Quay lại</a>
+        <?php
+        $back_url = '../index.php#post-' . $post_id;
+        if ($return_to === 'profile') {
+            $back_url = 'profile.php?username=' . urlencode($post['username']) . '#post-' . $post_id;
+        }
+        ?>
+        <a href="<?= $back_url ?>" class="btn-back">← Quay lại</a>
 
         <div class="post-detail">
             <div class="post-header">
@@ -246,22 +250,22 @@ $total_comments = $stmt->fetchColumn();
                 </a>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end;">
-                        <?php if ($post['privacy'] === 'private'): ?>
+                        <?php if ($post['privacy'] === 'private') { ?>
                             <span class="post-privacy privacy-private">
                                 <i class='bx bx-lock-alt'></i> Riêng tư
                             </span>
-                        <?php else: ?>
+                        <?php } else { ?>
                             <span class="post-privacy privacy-public">
                                 <i class='bx bx-globe'></i> Công khai
                             </span>
-                        <?php endif; ?>
+                        <?php } ?>
                         <span class="post-status status-<?= $post['status'] ?>">
                             <?= $post['status'] === 'solved' ? '✓ Đã giải quyết' : '? Chưa giải quyết' ?>
                         </span>
                     </div>
-                    <?php if (isLoggedIn() && $_SESSION['user_id'] == $post['user_id']): ?>
+                    <?php if (isLoggedIn() && $_SESSION['user_id'] == $post['user_id']) { ?>
                         <div class="post-actions">
-                            <button onclick="document.getElementById('editModal').style.display='block'" class="btn-edit"><i class='bx bx-edit'></i> Sửa</button>
+                            <a href="edit_post.php?id=<?= $post_id ?>" class="btn-edit" style="text-decoration: none;"><i class='bx bx-edit'></i> Sửa</a>
                             <form method="POST" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này?');">
                                 <button type="submit" name="delete_post" class="btn-delete"><i class='bx bx-trash'></i> Xóa</button>
                             </form>
@@ -271,19 +275,19 @@ $total_comments = $stmt->fetchColumn();
                                 </button>
                             </form>
                         </div>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
             </div>
 
             <h1 class="post-title"><?= h($post['title']) ?></h1>
 
-            <?php if ($post['tags']): ?>
+            <?php if ($post['tags']) { ?>
                 <div class="post-tags">
-                    <?php foreach (explode(',', $post['tags']) as $tag): ?>
+                    <?php foreach (explode(',', $post['tags']) as $tag) { ?>
                         <span class="tag"><?= h(trim($tag)) ?></span>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <div class="post-content" style="margin: 1.5rem 0; line-height: 1.8; color: #2d3436;">
                 <?= nl2br(h($post['content'])) ?>
@@ -302,39 +306,39 @@ $total_comments = $stmt->fetchColumn();
             }
             ?>
 
-            <?php if (!empty($images)): ?>
+            <?php if (!empty($images)) { ?>
                 <div class="post-images">
-                    <?php foreach ($images as $img): ?>
+                    <?php foreach ($images as $img) { ?>
                         <div class="post-image-item">
                             <img src="../<?= h($img['file_path']) ?>" alt="Ảnh đính kèm" onclick="window.open('../<?= h($img['file_path']) ?>', '_blank')">
                         </div>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
-            <?php if (!empty($files)): ?>
+            <?php if (!empty($files)) { ?>
                 <div style="margin: 1rem 0;">
                     <h4><i class='bx bx-paperclip'></i> File đính kèm:</h4>
-                    <?php foreach ($files as $file): ?>
+                    <?php foreach ($files as $file) { ?>
                         <a href="../<?= h($file['file_path']) ?>" target="_blank" class="btn-interact" style="display: inline-block; margin: 0.25rem 0;">
                             <i class='bx bx-file'></i> Download <?= strtoupper(pathinfo($file['file_path'], PATHINFO_EXTENSION)) ?>
                         </a>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
 
             <div class="interaction-bar">
                 <form method="POST" style="display: inline;">
-                    <?php if ($user_liked): ?>
+                    <?php if ($user_liked) { ?>
                         <button type="submit" name="unlike" class="btn-interact btn-liked">
                             <i class='bx bxs-like'></i> Đã thích (<?= $like_count ?>)
                         </button>
-                    <?php else: ?>
+                    <?php } else { ?>
                         <button type="submit" name="like" class="btn-interact">
                             <i class='bx bx-like'></i> Thích (<?= $like_count ?>)
                         </button>
-                    <?php endif; ?>
+                    <?php } ?>
                 </form>
 
                 <a href="#comments-section" class="btn-interact" style="text-decoration: none; color: inherit;">
@@ -357,7 +361,7 @@ $total_comments = $stmt->fetchColumn();
                 </select>
             </div>
 
-            <?php if (isLoggedIn()): ?>
+            <?php if (isLoggedIn()) { ?>
                 <div class="comment-form" id="comment-form">
                     <form method="POST">
                         <input type="hidden" name="parent_id" value="">
@@ -369,16 +373,16 @@ $total_comments = $stmt->fetchColumn();
                         </div>
                     </form>
                 </div>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="comment-form">
                     <p style="text-align: center; color: #636e72;">
                         <a href="login.php" style="color: var(--primary-mint); font-weight: bold;">Đăng nhập</a> để bình luận
                     </p>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <div id="comments-list" class="comments-list">
-                <?php foreach ($comments as $comment):
+                <?php foreach ($comments as $comment) {
                     $replies = getCommentsSorted($pdo, $post_id, 'oldest', $comment['id']);
                     $reply_count = count($replies);
                 ?>
@@ -392,9 +396,9 @@ $total_comments = $stmt->fetchColumn();
                                 <span class="comment-author-username">@<?= h($comment['username']) ?></span>
                             </a>
                             <span class="comment-meta">
-                                <?php if ($reply_count > 0): ?>
+                                <?php if ($reply_count > 0) { ?>
                                     <span class="reply-indicator"><i class='bx bx-message-rounded-dots'></i> <?= $reply_count ?> trả lời</span>
-                                <?php endif; ?>
+                                <?php } ?>
                                 <span class="comment-time"><i class='bx bx-time-five'></i> <?= timeAgo($comment['created_at']) ?></span>
                             </span>
                         </div>
@@ -417,27 +421,27 @@ $total_comments = $stmt->fetchColumn();
                         </div>
 
                         <div class="comment-actions">
-                            <?php if (isLoggedIn()): ?>
+                            <?php if (isLoggedIn()) { ?>
                                 <button class="btn-reply" onclick="toggleReplyForm(<?= $comment['id'] ?>)">
                                     <i class='bx bx-reply'></i> Trả lời
                                 </button>
-                                <?php if ($_SESSION['user_id'] == $comment['user_id']): ?>
+                                <?php if ($_SESSION['user_id'] == $comment['user_id']) { ?>
                                     <button class="btn-reply btn-edit" onclick="toggleEditForm(<?= $comment['id'] ?>)" style="color: #f39c12;">
                                         <i class='bx bx-edit'></i> Sửa
                                     </button>
-                                <?php endif; ?>
-                                <?php if ($_SESSION['user_id'] == $comment['user_id'] || $_SESSION['user_id'] == $post['user_id'] || (isset($_SESSION['account_level']) && $_SESSION['account_level'] == 0)): ?>
+                                <?php } ?>
+                                <?php if ($_SESSION['user_id'] == $comment['user_id'] || $_SESSION['user_id'] == $post['user_id'] || (isset($_SESSION['account_level']) && $_SESSION['account_level'] == 0)) { ?>
                                     <form method="POST" style="display: inline;" onsubmit="return confirm('Xóa bình luận này?');">
                                         <input type="hidden" name="comment_id" value="<?= $comment['id'] ?>">
                                         <button type="submit" name="delete_comment" class="btn-reply btn-delete" style="color: #e74c3c;">
                                             <i class='bx bx-trash'></i> Xóa
                                         </button>
                                     </form>
-                                <?php endif; ?>
-                            <?php endif; ?>
+                                <?php } ?>
+                            <?php } ?>
                         </div>
 
-                        <?php if (isLoggedIn()): ?>
+                        <?php if (isLoggedIn()) { ?>
                             <div id="reply-form-<?= $comment['id'] ?>" style="display: none;">
                                 <form method="POST">
                                     <input type="hidden" name="parent_id" value="<?= $comment['id'] ?>">
@@ -448,11 +452,11 @@ $total_comments = $stmt->fetchColumn();
                                     </div>
                                 </form>
                             </div>
-                        <?php endif; ?>
+                        <?php } ?>
 
-                        <?php if ($reply_count > 0): ?>
+                        <?php if ($reply_count > 0) { ?>
                             <div class="reply-thread">
-                                <?php foreach ($replies as $reply): ?>
+                                <?php foreach ($replies as $reply) { ?>
                                     <div class="comment reply" id="comment-<?= $reply['id'] ?>">
                                         <div class="comment-header">
                                             <a href="profile.php?username=<?= urlencode($reply['username']) ?>" class="comment-author" style="text-decoration: none; color: inherit;">
@@ -483,27 +487,27 @@ $total_comments = $stmt->fetchColumn();
                                         </div>
 
                                         <div class="comment-actions">
-                                            <?php if (isLoggedIn()): ?>
+                                            <?php if (isLoggedIn()) { ?>
                                                 <button class="btn-reply" onclick="toggleReplyForm(<?= $reply['id'] ?>)">
                                                     <i class='bx bx-reply'></i> Trả lời
                                                 </button>
-                                                <?php if ($_SESSION['user_id'] == $reply['user_id']): ?>
+                                                <?php if ($_SESSION['user_id'] == $reply['user_id']) { ?>
                                                     <button class="btn-reply btn-edit" onclick="toggleEditForm(<?= $reply['id'] ?>)" style="color: #f39c12;">
                                                         <i class='bx bx-edit'></i> Sửa
                                                     </button>
-                                                <?php endif; ?>
-                                                <?php if ($_SESSION['user_id'] == $reply['user_id'] || $_SESSION['user_id'] == $post['user_id'] || (isset($_SESSION['account_level']) && $_SESSION['account_level'] == 0)): ?>
+                                                <?php } ?>
+                                                <?php if ($_SESSION['user_id'] == $reply['user_id'] || $_SESSION['user_id'] == $post['user_id'] || (isset($_SESSION['account_level']) && $_SESSION['account_level'] == 0)) { ?>
                                                     <form method="POST" style="display: inline;" onsubmit="return confirm('Xóa bình luận này?');">
                                                         <input type="hidden" name="comment_id" value="<?= $reply['id'] ?>">
                                                         <button type="submit" name="delete_comment" class="btn-reply btn-delete" style="color: #e74c3c;">
                                                             <i class='bx bx-trash'></i> Xóa
                                                         </button>
                                                     </form>
-                                                <?php endif; ?>
-                                            <?php endif; ?>
+                                                <?php } ?>
+                                            <?php } ?>
                                         </div>
 
-                                        <?php if (isLoggedIn()): ?>
+                                        <?php if (isLoggedIn()) { ?>
                                             <div id="reply-form-<?= $reply['id'] ?>" style="display: none;">
                                                 <form method="POST">
                                                     <input type="hidden" name="parent_id" value="<?= $comment['id'] ?>">
@@ -514,50 +518,22 @@ $total_comments = $stmt->fetchColumn();
                                                     </div>
                                                 </form>
                                             </div>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </div>
-                                <?php endforeach; ?>
+                                <?php } ?>
                             </div>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
-                <?php endforeach; ?>
+                <?php } ?>
 
-                <?php if (empty($comments)): ?>
+                <?php if (empty($comments)) { ?>
                     <div style="text-align: center; padding: 3rem; color: #636e72;">
                         <div style="font-size: 3rem;"><i class='bx bx-message'></i></div>
                         <p>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
                     </div>
-                <?php endif; ?>
+                <?php } ?>
             </div>
         </div>
-
-
-        <?php if (isLoggedIn() && $_SESSION['user_id'] == $post['user_id']): ?>
-            <div id="editModal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <button class="close-modal" onclick="document.getElementById('editModal').style.display='none'">&times;</button>
-                    <h2 style="color: var(--primary-mint); margin-bottom: 1.5rem;"><i class='bx bx-edit'></i> Chỉnh sửa bài viết</h2>
-                    <form method="POST">
-                        <div class="form-group">
-                            <label>Tiêu đề</label>
-                            <input type="text" name="title" value="<?= h($post['title']) ?>" required style="width: 100%; padding: 0.75rem; border: 2px solid var(--bg-grey); border-radius: 8px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Nội dung</label>
-                            <textarea name="content" required style="width: 100%; padding: 0.75rem; border: 2px solid var(--bg-grey); border-radius: 8px; min-height: 200px;"><?= h($post['content']) ?></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Tags</label>
-                            <input type="text" name="tags" value="<?= h($post['tags']) ?>" placeholder="HTML, CSS, JavaScript" style="width: 100%; padding: 0.75rem; border: 2px solid var(--bg-grey); border-radius: 8px;">
-                        </div>
-                        <div style="display: flex; gap: 1rem;">
-                            <button type="submit" name="edit_post" class="btn-submit" style="flex: 1;"><i class='bx bx-save'></i> Lưu thay đổi</button>
-                            <button type="button" onclick="document.getElementById('editModal').style.display='none'" style="flex: 1; background: #dfe6e9; color: #2d3436; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 600; cursor: pointer;">Hủy</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        <?php endif; ?>
 
         <footer style="text-align: center; padding: 2rem; margin-top: 3rem; background: var(--bg-grey); border-radius: 15px;">
             <p style="color: #636e72; margin: 0;">
@@ -604,13 +580,6 @@ $total_comments = $stmt->fetchColumn();
                     form.style.display = 'none';
                     content.style.display = 'block';
                 }
-            }
-        }
-
-        window.onclick = function(event) {
-            var modal = document.getElementById('editModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
             }
         }
     </script>

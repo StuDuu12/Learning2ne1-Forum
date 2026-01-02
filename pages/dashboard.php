@@ -55,7 +55,7 @@ $user_posts = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Diễn đàn sinh viên</title>
-    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -66,11 +66,10 @@ $user_posts = $stmt->fetchAll();
 
     <div class="container">
         <div class="dashboard-header">
-            <h1><i class='bx bx-bar-chart-square'></i> Dashboard</h1>
-            <p>Xin chào, <?= h($current_user['username'] ?? 'User') ?>! Đây là tổng quan hoạt động của bạn.</p>
+            <h1><i class='bx bx-bar-chart-square'></i> Thống kê xu hướng</h1>
         </div>
 
-        <?php if ($isAdmin): ?>
+        <?php if ($isAdmin) { ?>
             <h2 style="color: var(--primary-mint); margin-bottom: 1rem;"><i class='bx  bx-bar-chart-square'></i> Thống kê hệ thống (Admin)</h2>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -89,7 +88,7 @@ $user_posts = $stmt->fetchAll();
                     <div class="stat-label">Tổng lượt thích</div>
                 </div>
             </div>
-        <?php endif; ?>
+        <?php } ?>
 
         <h2 style="color: var(--primary-mint); margin-bottom: 1rem;"><i class='bx bx-line-chart'></i> Thống kê cá nhân</h2>
         <div class="stats-grid">
@@ -151,11 +150,10 @@ $user_posts = $stmt->fetchAll();
                 <canvas id="personalChart"></canvas>
             </div>
         </div>
-
         <footer style="text-align: center; padding: 2rem; margin-top: 3rem; background: var(--bg-grey); border-radius: 15px;">
             <p style="color: #636e72; margin: 0;">
-                <i class='bx bx-bar-chart-square'></i> Dashboard được xem bởi <strong><?= h($current_user['username'] ?? 'User') ?></strong> •
-                <?= date('d/m/Y H:i') ?>
+                <strong>Learning2ne1 Forum</strong><br>
+                Được tạo bởi <strong>Chu Quang Duy</strong>
             </p>
         </footer>
 

@@ -212,6 +212,32 @@
     color: #a0aec0;
 }
 
+/* Inline Error Styles */
+.form-group.has-error input,
+.form-group.has-error textarea {
+    border-color: #e74c3c;
+    background-color: #fef5f5;
+}
+
+.form-group.has-error input:focus,
+.form-group.has-error textarea:focus {
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15);
+}
+
+.error-text {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.error-text i {
+    font-size: 1rem;
+}
+
 .field-hint {
     font-size: 0.85rem;
     color: #718096;

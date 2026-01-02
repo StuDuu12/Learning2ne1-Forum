@@ -58,8 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - Diễn đàn Sinh viên</title>
-    <link rel="stylesheet" href="../assets/css/base.css">
+    <title>Đăng nhập - Learning2ne1 Forum</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/login.css">
 </head>
 
@@ -68,23 +68,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-container">
             <div class="login-header">
                 <h2>Đăng nhập</h2>
-                <p>Đăng nhập để tiếp tục và tham gia cộng đồng.</p>
+                <p style="font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #00b894 0%, #00cec9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0.5rem 0 0 0; letter-spacing: 0.5px;">Learning2ne1 Forum</p>
             </div>
+            <br>
             <form class="login-form" method="POST" action="">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" placeholder="Nhập username" value="<?php echo htmlspecialchars($usernameInput); ?>">
-                    <?php if (!empty($errors['username'])): ?>
+                    <?php if (!empty($errors['username'])) { ?>
                         <p class="field-error"><?php echo $errors['username']; ?></p>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Mật khẩu</label>
                     <input type="password" id="password" name="password" placeholder="Nhập mật khẩu">
-                    <?php if (!empty($errors['password'])): ?>
+                    <?php if (!empty($errors['password'])) { ?>
                         <p class="field-error"><?php echo $errors['password']; ?></p>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
 
                 <button type="submit" class="btn-login">Đăng nhập</button>

@@ -6,53 +6,47 @@ if (!isLoggedIn()) {
     redirect('login.php');
 }
 
-$error = '';
+$errors = [];
 $success = '';
 
+$title = '';
+$content = '';
+$tags_input = '';
+$privacy = 'public';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = trim($_POST['title']);
-    $content = trim($_POST['content']);
+    $title = trim($_POST['title'] ?? '');
+    $content = trim($_POST['content'] ?? '');
+    $tags_input = trim($_POST['tags'] ?? '');
+    $privacy = $_POST['privacy'] ?? 'public';
 
     if (empty($title)) {
-        $error = 'Vui lòng nhập tiêu đề bài viết';
-    } elseif (strlen($title) < 5) {
-        $error = 'Tiêu đề phải có ít nhất 5 ký tự';
+        $errors['title'] = 'Vui lòng nhập tiêu đề bài viết';
     } elseif (strlen($title) > 200) {
-        $error = 'Tiêu đề không được vượt quá 200 ký tự';
+        $errors['title'] = 'Tiêu đề không được vượt quá 200 ký tự';
     }
 
     if (empty($content)) {
-        $error = 'Vui lòng nhập nội dung bài viết';
-    } elseif (strlen($content) < 10) {
-        $error = 'Nội dung phải có ít nhất 10 ký tự';
+        $errors['content'] = 'Vui lòng nhập nội dung bài viết';
     } elseif (strlen($content) > 5000) {
-        $error = 'Nội dung không được vượt quá 5000 ký tự';
+        $errors['content'] = 'Nội dung không được vượt quá 5000 ký tự';
     }
 
-    $tags_input = trim($_POST['tags'] ?? '');
     if (!empty($tags_input)) {
-        if (strlen($tags_input) > 100) {
-            $error = 'Tag không được vượt quá 100 ký tự';
-        } else {
-            $tags_array = preg_split('/[,\s]+/', $tags_input);
-            $tags_array = array_filter(array_map('trim', $tags_array));
+        $tags_array = preg_split('/[,\s]+/', $tags_input);
+        $tags_array = array_filter(array_map('trim', $tags_array));
 
-            if (count($tags_array) > 5) {
-                $error = 'Không được nhập quá 5 tag';
-            } else {
-                $tags_array = array_map(function ($tag) {
-                    return (strpos($tag, '#') !== 0) ? '#' . $tag : $tag;
-                }, $tags_array);
-                $tags = implode(',', $tags_array);
-            }
+        if (count($tags_array) > 10) {
+            $errors['tags'] = 'Không được nhập quá 10 tag';
+        } else {
+            $tags = implode(',', $tags_array);
         }
     } else {
         $tags = '';
     }
 
-    $privacy = $_POST['privacy'] ?? 'public';
     if (!in_array($privacy, ['public', 'private'])) {
-        $error = 'Quyền riêng tư không hợp lệ';
+        $errors['privacy'] = 'Quyền riêng tư không hợp lệ';
     }
 
     if (isset($_FILES['attachments']) && $_FILES['attachments']['error'][0] !== UPLOAD_ERR_NO_FILE) {
@@ -70,25 +64,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         foreach ($_FILES['attachments']['tmp_name'] as $key => $tmp_name) {
             if ($_FILES['attachments']['error'][$key] !== UPLOAD_ERR_OK && $_FILES['attachments']['error'][$key] !== UPLOAD_ERR_NO_FILE) {
-                $error = 'Có lỗi khi upload file: ' . $_FILES['attachments']['name'][$key];
+                $errors['attachments'] = 'Có lỗi khi upload file: ' . $_FILES['attachments']['name'][$key];
                 break;
             }
 
             if ($_FILES['attachments']['error'][$key] === UPLOAD_ERR_OK) {
                 if ($_FILES['attachments']['size'][$key] > $max_file_size) {
-                    $error = 'File ' . $_FILES['attachments']['name'][$key] . ' vượt quá 100MB';
+                    $errors['attachments'] = 'File ' . $_FILES['attachments']['name'][$key] . ' vượt quá 100MB';
                     break;
                 }
 
                 if (!in_array($_FILES['attachments']['type'][$key], $allowed_types)) {
-                    $error = 'File ' . $_FILES['attachments']['name'][$key] . ' không được hỗ trợ. Chỉ hỗ trợ: ảnh, PDF, Word, Excel';
+                    $errors['attachments'] = 'File ' . $_FILES['attachments']['name'][$key] . ' không được hỗ trợ. Chỉ hỗ trợ: ảnh, PDF, Word, Excel';
                     break;
                 }
             }
         }
     }
 
-    if (empty($error)) {
+    if (empty($errors)) {
         try {
             $pdo->beginTransaction();
 
@@ -122,12 +116,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+            if (!empty($tags)) {
+                trackInterests($pdo, $_SESSION['user_id'], $tags);
+            }
+
             $pdo->commit();
             $success = 'Bài viết đã được tạo thành công!';
             header("refresh:1;url=../index.php");
         } catch (Exception $e) {
             $pdo->rollBack();
-            $error = 'Có lỗi xảy ra: ' . $e->getMessage();
+            $errors['general'] = 'Có lỗi xảy ra: ' . $e->getMessage();
         }
     }
 }
@@ -139,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tạo bài viết - Diễn đàn sinh viên</title>
-    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/create_post.css">
     <link href="https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css" rel="stylesheet">
 </head>
@@ -153,42 +151,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>Chia sẻ câu hỏi, kinh nghiệm hoặc thảo luận với cộng đồng</p>
             </div>
 
-            <?php if ($error): ?>
+            <?php if (!empty($errors)) { ?>
                 <div class="alert alert-error">
-                    <i class='bx bx-error-circle'></i> <?= h($error) ?>
+                    <i class='bx bx-error-circle'></i>
+                    <?php if (isset($errors['general'])) { ?>
+                        <?= h($errors['general']) ?>
+                    <?php } else { ?>
+                        Vui lòng kiểm tra lại thông tin bên dưới
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
-            <?php if ($success): ?>
+            <?php if ($success) { ?>
                 <div class="alert alert-success">
                     <i class='bx bx-check-circle'></i> <?= h($success) ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <form method="POST" enctype="multipart/form-data">
 
                 <div class="form-section">
                     <h3><i class='bx bx-info-circle'></i> Thông tin cơ bản</h3>
 
-                    <div class="form-group">
+                    <div class="form-group <?= isset($errors['title']) ? 'has-error' : '' ?>">
                         <label><i class='bx bx-heading'></i> Tiêu đề bài viết</label>
-                        <input type="text" name="title" required minlength="5" maxlength="200" placeholder="Ví dụ: Làm thế nào để tạo animation với CSS?">
-                        <small class="field-hint">Từ 5-200 ký tự</small>
+                        <input type="text" name="title" placeholder="Ví dụ: Làm thế nào để tạo animation với CSS?" value="<?= h($title) ?>">
+                        <?php if (isset($errors['title'])) { ?>
+                            <small class="error-text"><i class='bx bx-error'></i> <?= h($errors['title']) ?></small>
+                        <?php } ?>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group <?= isset($errors['content']) ? 'has-error' : '' ?>">
                         <label><i class='bx bx-text'></i> Nội dung bài viết</label>
-                        <textarea name="content" required minlength="10" maxlength="5000" placeholder="Mô tả chi tiết câu hỏi hoặc nội dung của bạn..."></textarea>
-                        <small class="field-hint">Từ 10-5000 ký tự</small>
+                        <textarea name="content" placeholder="Mô tả chi tiết câu hỏi hoặc nội dung của bạn..."><?= h($content) ?></textarea>
+                        <?php if (isset($errors['content'])) { ?>
+                            <small class="error-text"><i class='bx bx-error'></i> <?= h($errors['content']) ?></small>
+                        <?php } ?>
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h3><i class='bx bx-hashtag'></i> Hashtag</h3>
-                    <div class="form-group">
+                    <div class="form-group <?= isset($errors['tags']) ? 'has-error' : '' ?>">
                         <label><i class='bx bx-tag'></i> Nhập tag</label>
-                        <input type="text" name="tags" maxlength="200" placeholder="Ví dụ: php, mysql, web hoặc php mysql web">
-                        <small class="field-hint">Tối đa 10 tag, 200 ký tự</small>
+                        <input type="text" name="tags" placeholder="Ví dụ: PHP, MySQL, Laravel" value="<?= h($tags_input) ?>">
+                        <?php if (isset($errors['tags'])) { ?>
+                            <small class="error-text"><i class='bx bx-error'></i> <?= h($errors['tags']) ?></small>
+                        <?php } ?>
                     </div>
                 </div>
 
@@ -196,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h3><i class='bx bx-lock-alt'></i> Quyền riêng tư</h3>
                     <div class="privacy-options">
                         <div class="privacy-option">
-                            <input type="radio" name="privacy" value="public" id="privacy-public" checked>
+                            <input type="radio" name="privacy" value="public" id="privacy-public" <?= $privacy === 'public' ? 'checked' : '' ?>>
                             <label for="privacy-public" class="privacy-label">
                                 <div class="privacy-icon"><i class="bx bx-globe"></i></div>
                                 <div>
@@ -206,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </label>
                         </div>
                         <div class="privacy-option">
-                            <input type="radio" name="privacy" value="private" id="privacy-private">
+                            <input type="radio" name="privacy" value="private" id="privacy-private" <?= $privacy === 'private' ? 'checked' : '' ?>>
                             <label for="privacy-private" class="privacy-label">
                                 <div class="privacy-icon"><i class="bx bx-lock"></i></div>
                                 <div>
@@ -231,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-actions">
-                    <a href="../index.php" class="btn-secondary">
+                    <a href="../index.php" class="btn-secondary" style="text-decoration: none;">
                         <i class='bx bx-arrow-back'></i> Quay lại
                     </a>
                     <button type="submit" class="btn-primary">
@@ -241,8 +250,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
-
-
 </body>
 
 </html>

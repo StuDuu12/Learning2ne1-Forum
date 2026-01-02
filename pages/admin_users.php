@@ -114,7 +114,7 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
 <head>
     <meta charset="UTF-8">
     <title>Quản lý Thành viên</title>
-    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin_users.css">
     <link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -132,36 +132,36 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
                 <div class="create-user-section">
                     <h2><i class='bx bx-user-plus'></i> Tạo thành viên mới</h2>
 
-                    <?php if (!empty($errors['general'])): ?>
+                    <?php if (!empty($errors['general'])) { ?>
                         <div class="alert alert-error" style="background: #ff7675; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                             <?php echo $errors['general']; ?>
                         </div>
-                    <?php endif; ?>
+                    <?php } ?>
 
-                    <?php if (!empty($success)): ?>
+                    <?php if (!empty($success)) { ?>
                         <div class="alert alert-success" style="background: #00b894; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                             <i class='bx bx-check-circle'></i> <?php echo $success; ?>
                         </div>
-                    <?php endif; ?>
+                    <?php } ?>
 
                     <form method="POST" action="" class="form-grid">
                         <input type="hidden" name="action" value="create_user">
                         <div class="form-group">
                             <label for="username"><i class='bx bx-at'></i> Username</label>
                             <input type="text" name="username" id="username" class="form-control" value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>" placeholder="Nhập username">
-                            <?php if (!empty($errors['username'])): ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['username']; ?></p><?php endif; ?>
+                            <?php if (!empty($errors['username'])) { ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['username']; ?></p><?php } ?>
                         </div>
 
                         <div class="form-group">
                             <label for="ho_ten"><i class='bx bx-user'></i> Họ tên</label>
                             <input type="text" name="ho_ten" id="ho_ten" class="form-control" value="<?php echo htmlspecialchars($_POST['ho_ten'] ?? ''); ?>" placeholder="Nhập họ tên đầy đủ">
-                            <?php if (!empty($errors['ho_ten'])): ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['ho_ten']; ?></p><?php endif; ?>
+                            <?php if (!empty($errors['ho_ten'])) { ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['ho_ten']; ?></p><?php } ?>
                         </div>
 
                         <div class="form-group">
                             <label for="password"><i class='bx bx-lock'></i> Mật khẩu</label>
                             <input type="password" name="password" id="password" class="form-control" placeholder="Ít nhất 6 ký tự">
-                            <?php if (!empty($errors['password'])): ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['password']; ?></p><?php endif; ?>
+                            <?php if (!empty($errors['password'])) { ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['password']; ?></p><?php } ?>
                         </div>
 
                         <div class="form-group">
@@ -171,7 +171,7 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
                                 <option value="1" <?php echo (isset($_POST['account_level']) && $_POST['account_level'] == '1') ? 'selected' : ''; ?>>Giảng viên</option>
                                 <option value="0" <?php echo (isset($_POST['account_level']) && $_POST['account_level'] == '0') ? 'selected' : ''; ?>>Admin</option>
                             </select>
-                            <?php if (!empty($errors['account_level'])): ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['account_level']; ?></p><?php endif; ?>
+                            <?php if (!empty($errors['account_level'])) { ?><p class="field-error" style="color: #e74c3c; font-size: 0.85rem; margin-top: 0.25rem;"><?php echo $errors['account_level']; ?></p><?php } ?>
                         </div>
 
                         <div class="form-group">
@@ -216,9 +216,9 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
                     <button type="submit" style="padding: 0.75rem 1.5rem; background: var(--primary-mint); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                         <i class='bx bx-search'></i> Lọc
                     </button>
-                    <?php if (!empty($search) || $filter_role !== ''): ?>
+                    <?php if (!empty($search) || $filter_role !== '') { ?>
                         <a href="admin_users.php" style="padding: 0.75rem 1rem; color: #636e72; text-decoration: none;">✕ Xóa bộ lọc</a>
-                    <?php endif; ?>
+                    <?php } ?>
                 </form>
 
                 <div class="users-section">
@@ -234,14 +234,14 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($users as $u): ?>
+                                <?php foreach ($users as $u) { ?>
                                     <tr class="<?= $u['id_user'] == ($_SESSION['user_id'] ?? 0) ? 'current-user-row' : '' ?>">
                                         <td><?php echo $u['id_user']; ?></td>
                                         <td>
                                             <strong><?php echo htmlspecialchars($u['username']); ?></strong>
-                                            <?php if ($u['id_user'] == ($_SESSION['user_id'] ?? 0)): ?>
+                                            <?php if ($u['id_user'] == ($_SESSION['user_id'] ?? 0)) { ?>
                                                 <small style="color: #f39c12;">(Bạn)</small>
-                                            <?php endif; ?>
+                                            <?php } ?>
                                         </td>
                                         <td><?php echo htmlspecialchars($u['ho_ten'] ?? ''); ?></td>
                                         <td>
@@ -257,7 +257,7 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
                                         </td>
                                         <td>
                                             <div class="user-actions-cell">
-                                                <?php if ($u['id_user'] != ($_SESSION['user_id'] ?? 0)): ?>
+                                                <?php if ($u['id_user'] != ($_SESSION['user_id'] ?? 0)) { ?>
 
                                                     <form method="POST" style="display: inline-flex; gap: 0.25rem; align-items: center;">
                                                         <input type="hidden" name="action" value="change_role">
@@ -277,23 +277,23 @@ $studentsCount = (int) $pdo->query("SELECT COUNT(*) FROM user WHERE account_leve
                                                         style="padding: 0.4rem 0.75rem; background: #e74c3c; color: white; text-decoration: none; border-radius: 6px; font-size: 0.85rem;">
                                                         <i class='bx bx-trash'></i> Xóa
                                                     </a>
-                                                <?php else: ?>
+                                                <?php } else { ?>
                                                     <em style="color: #95a5a6;">Không thể sửa/xóa</em>
-                                                <?php endif; ?>
+                                                <?php } ?>
                                             </div>
                                         </td>
                                     </tr>
-                                <?php endforeach; ?>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>
 
-                    <?php if (empty($users)): ?>
+                    <?php if (empty($users)) { ?>
                         <div style="text-align: center; padding: 2rem; color: #636e72;">
                             <i class='bx bx-user-x' style="font-size: 3rem;"></i>
                             <p>Không tìm thấy thành viên nào.</p>
                         </div>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
             </div>
         </div>
