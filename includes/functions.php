@@ -151,6 +151,21 @@ function incrementViews($pdo, $post_id)
     $stmt->execute([$post_id]);
 }
 
+function incrementPostView($pdo, $post_id)
+{
+    if (!isset($_SESSION['viewed_posts']) || !is_array($_SESSION['viewed_posts'])) {
+        $_SESSION['viewed_posts'] = [];
+    }
+
+    if (in_array($post_id, $_SESSION['viewed_posts'], true)) {
+        return false;
+    }
+
+    incrementViews($pdo, $post_id);
+    $_SESSION['viewed_posts'][] = $post_id;
+    return true;
+}
+
 
 function getAttachments($pdo, $post_id)
 {
