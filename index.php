@@ -409,6 +409,9 @@ if ($filter_sort === 'oldest') {
                                         <i class='bx bx-like'></i> <span class="like-count"><?= $likes ?></span>
                                     </button>
                                 </form>
+                                <span class="btn-action btn-comment" style="cursor: default;">
+                                    <i class='bx bx-show'></i> <?= (int)($post['views'] ?? 0) ?>
+                                </span>
                                 <a href="pages/post.php?id=<?= $post['id'] ?>#comments" class="btn-action btn-comment" style="text-decoration: none;">
                                     <i class='bx bx-message'></i> <?= $post['comment_count'] ?? 0 ?>
                                 </a>
@@ -528,6 +531,9 @@ if ($filter_sort === 'oldest') {
                                         <i class='bx bx-like'></i> <span class="like-count"><?= $post['like_count'] ?></span>
                                     </button>
                                 </form>
+                                <span class="btn-action btn-comment" style="cursor: default;">
+                                    <i class='bx bx-show'></i> <?= (int)($post['views'] ?? 0) ?>
+                                </span>
                                 <a href="pages/post.php?id=<?= $post['id'] ?>#comments" class="btn-action btn-comment" style="text-decoration: none;">
                                     <i class='bx bx-message'></i> <?= $post['comment_count'] ?? 0 ?>
                                 </a>

@@ -18,8 +18,11 @@ if ($post['privacy'] === 'private') {
     }
 }
 
+if (incrementPostView($pdo, $post_id)) {
+    $post['views']++;
+}
+
 if (isLoggedIn()) {
-    incrementViews($pdo, $post_id);
     trackInterests($pdo, $_SESSION['user_id'], $post['tags']);
 }
 
@@ -338,6 +341,10 @@ $total_comments = $stmt->fetchColumn();
                         </button>
                     <?php } ?>
                 </form>
+
+                <span class="btn-interact" style="cursor: default;">
+                    <i class='bx bx-show'></i> Lượt xem (<?= (int)$post['views'] ?>)
+                </span>
 
                 <a href="#comments-section" class="btn-interact" style="text-decoration: none; color: inherit;">
                     <i class='bx bx-message'></i> Bình luận (<?= $total_comments ?>)
