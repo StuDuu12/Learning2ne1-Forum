@@ -240,3 +240,97 @@ function parseResourceMeta($mo_ta)
         'description' => trim($description)
     ];
 }
+
+function diagramStoragePath()
+{
+    $path = __DIR__ . '/../data/dbdiagram_projects.json';
+    if (!file_exists($path)) {
+        file_put_contents($path, '[]', LOCK_EX);
+    }
+    return $path;
+}
+
+function readDiagramProjects()
+{
+    $path = diagramStoragePath();
+    $content = file_get_contents($path);
+    $decoded = json_decode($content, true);
+    return is_array($decoded) ? $decoded : [];
+}
+
+function writeDiagramProjects($projects)
+{
+    $path = diagramStoragePath();
+    file_put_contents(
+        $path,
+        json_encode(array_values($projects), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+        LOCK_EX
+    );
+}
+
+function listDiagramProjects($user_id)
+{
+    $projects = readDiagramProjects();
+    $filtered = array_values(array_filter($projects, function ($project) use ($user_id) {
+        return (int) ($project['user_id'] ?? 0) === (int) $user_id;
+    }));
+
+    usort($filtered, function ($a, $b) {
+        return strcmp($b['updated_at'] ?? '', $a['updated_at'] ?? '');
+    });
+
+    return $filtered;
+}
+
+function saveDiagramProject($user_id, $name, $schema, $project_id = '')
+{
+    $projects = readDiagramProjects();
+    $now = date('c');
+
+    $project = [
+        'id' => $project_id !== '' ? $project_id : uniqid('diagram_', true),
+        'user_id' => (int) $user_id,
+        'name' => mb_substr($name, 0, 120),
+        'schema' => $schema,
+        'updated_at' => $now,
+        'created_at' => $now,
+    ];
+
+    $updated = false;
+    foreach ($projects as $idx => $item) {
+        if (($item['id'] ?? '') === $project['id'] && (int) ($item['user_id'] ?? 0) === (int) $user_id) {
+            $project['created_at'] = $item['created_at'] ?? $now;
+            $projects[$idx] = $project;
+            $updated = true;
+            break;
+        }
+    }
+
+    if (!$updated) {
+        $projects[] = $project;
+    }
+
+    writeDiagramProjects($projects);
+
+    return $project;
+}
+
+function deleteDiagramProject($user_id, $project_id)
+{
+    $projects = readDiagramProjects();
+    $before = count($projects);
+
+    $projects = array_values(array_filter($projects, function ($project) use ($user_id, $project_id) {
+        return !(
+            (int) ($project['user_id'] ?? 0) === (int) $user_id &&
+            ($project['id'] ?? '') === $project_id
+        );
+    }));
+
+    if (count($projects) === $before) {
+        return false;
+    }
+
+    writeDiagramProjects($projects);
+    return true;
+}
