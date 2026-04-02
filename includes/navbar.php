@@ -33,6 +33,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <a href="<?= $path ?>index.php" class="nav-link <?= $current_page == 'index.php' ? 'active' : '' ?>"><i class='bx  bx-home-alt-3'></i> Trang chủ</a>
             <a href="<?= $path ?>pages/resources.php" class="nav-link <?= $current_page == 'resources.php' ? 'active' : '' ?>"><i class='bx  bx-book-library'></i> Học liệu</a>
             <a href="<?= $path ?>pages/dashboard.php" class="nav-link <?= $current_page == 'dashboard.php' ? 'active' : '' ?>"><i class='bx  bx-chart-bar-columns'></i> Xu hướng</a>
+            <a href="<?= $path ?>pages/dbdiagram.php" class="nav-link <?= $current_page == 'dbdiagram.php' ? 'active' : '' ?>"><i class='bx bx-data'></i> DB Diagram</a>
 
             <?php
             $accountLevel = $_SESSION['account_level'] ?? $_SESSION['role'] ?? null;
